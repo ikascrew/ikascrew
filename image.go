@@ -5,57 +5,71 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"image"
 	"image/draw"
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
-	"github.com/google/gxui/samples/flags"
+	"github.com/google/gxui/themes/dark"
+	"github.com/secondarykey/go-opencv/opencv"
 )
 
 func appMain(driver gxui.Driver) {
-	args := flag.Args()
-	if len(args) != 1 {
-		fmt.Print("usage: image_viewer image-path\n")
-		os.Exit(1)
+
+	filename := "/home/secondarykey/Videos/matrix2.mp4"
+	capt := opencv.NewFileCapture(filename)
+	if capt == nil {
+		panic("can not open video")
 	}
+	defer capt.Release()
 
-	file := args[0]
-	f, err := os.Open(file)
-	if err != nil {
-		fmt.Printf("Failed to open image '%s': %v\n", file, err)
-		os.Exit(1)
-	}
+	//
+	//fps := int(capt.GetProperty(opencv.CV_CAP_PROP_FPS))
+	//frames := int(capt.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
+	w := int(capt.GetProperty(opencv.CV_CAP_PROP_FRAME_WIDTH))
+	h := int(capt.GetProperty(opencv.CV_CAP_PROP_FRAME_HEIGHT))
 
-	source, _, err := image.Decode(f)
-	if err != nil {
-		fmt.Printf("Failed to read image '%s': %v\n", file, err)
-		os.Exit(1)
-	}
+	theme := dark.CreateTheme(driver)
+	imgWd := theme.CreateImage()
 
-	theme := flags.CreateTheme(driver)
-	img := theme.CreateImage()
+	window := theme.CreateWindow(w, h, "movie viewer")
+	window.SetScale(1.0)
+	window.AddChild(imgWd)
 
-	mx := source.Bounds().Max
-	window := theme.CreateWindow(mx.X, mx.Y, "Image viewer")
-	window.SetScale(flags.DefaultScaleFactor)
-	window.AddChild(img)
-
-	// Copy the image to a RGBA format before handing to a gxui.Texture
-	rgba := image.NewRGBA(source.Bounds())
-	draw.Draw(rgba, source.Bounds(), source, image.ZP, draw.Src)
-	texture := driver.CreateTexture(rgba, 1)
-	img.SetTexture(texture)
+	rect := image.Rect(0, 0, w, h)
+	rgba := image.NewRGBA(rect)
 
 	window.OnClose(driver.Terminate)
+
+	// loop  ReDraw
+
+	cvImage := capt.QueryFrame()
+	frame_pos := int(capt.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
+	if frame_pos >= frames {
+		break
+	}
+
+	/*
+		type Image interface {
+		    image.Image
+		    Set(x, y int, c color.Color)
+		}
+	*/
+
+	/*
+	   func Draw(dst Image, r image.Rectangle, src image.Image, sp image.Point, op Op)
+	   -> draw.Draw(rgba, source.Bounds(), source, image.ZP, draw.Src)
+	*/
+
+	draw.Draw(rgba, rect, cvImage.ToImage(), image.ZP, draw.Src)
+
+	texture := driver.CreateTexture(rgba, 1)
+	imgWd.SetTexture(texture)
+
 }
 
 func main() {
-	flag.Parse()
 	gl.StartDriver(appMain)
 }
