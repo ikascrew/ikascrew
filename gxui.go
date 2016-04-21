@@ -1,7 +1,3 @@
-// Copyright 2015 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -9,6 +5,10 @@ import (
 	"image/draw"
 	_ "image/jpeg"
 	_ "image/png"
+	"log"
+	"net/http"
+
+	_ "net/http/pprof"
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
@@ -29,10 +29,11 @@ func appMain(driver gxui.Driver) {
 	h := int(capt.GetProperty(opencv.CV_CAP_PROP_FRAME_HEIGHT))
 
 	theme := dark.CreateTheme(driver)
-	imgWd := theme.CreateImage()
 
 	window := theme.CreateWindow(w, h, "movie viewer")
 	window.SetScale(1.0)
+
+	imgWd := theme.CreateImage()
 	window.AddChild(imgWd)
 
 	rect := image.Rect(0, 0, w, h)
@@ -48,5 +49,9 @@ func appMain(driver gxui.Driver) {
 }
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
 	gl.StartDriver(appMain)
 }
