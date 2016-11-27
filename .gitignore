@@ -2,3 +2,5 @@
 *.avi
 *.mp4
 .*
+setting/*
+pkg/*
