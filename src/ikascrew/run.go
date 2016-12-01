@@ -32,13 +32,15 @@ func Run(dir string) error {
 	for k, _ := range videos {
 		fmt.Println(k)
 	}
+	main := "ikascrew"
+	win := NewMainWindow(main)
+	windows[main] = win
 
-	windows["0"] = NewMainWindow("0")
+	video := NewMainVideo("default.mp4")
 
-	//windows["1"] = NewSubWindow("1")
-	//createWindow("Second")
-	//createWindow("Thered")
-
+	go func() {
+		win.Play(video)
+	}()
 	return nil
 }
 
@@ -57,7 +59,7 @@ func GetVideo(name string) (Queue, error) {
 
 	v, flg := videos[project+"/"+name]
 	if !flg {
-		return nil, fmt.Errorf("%s not Found" + name)
+		return nil, fmt.Errorf("%s not Found", name)
 	}
 
 	return v, nil

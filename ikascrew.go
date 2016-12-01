@@ -21,62 +21,53 @@ func init() {
 
 func main() {
 
-	//max
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
-	//debug
 	go func() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
-
-	//arg directory
 
 	err := ikascrew.Run("setting")
 	if err != nil {
 		os.Exit(-1)
 	}
 
-	setMovieWindow("0", "1024x576.mp4")
-	//setMovieWindow("1", "default.mp4")
-
 	fmt.Println("###################################################")
-	source := "0"
+	source := "ikascrew"
 
 	for {
 
 		fmt.Print(source + " > ")
 		sc.Scan()
 		cmd := sc.Text()
-		fmt.Println(cmd)
 
 		cmds := strings.Split(cmd, " ")
 
 		switch cmds[0] {
-		case "set":
-			if source != "" {
-				m := cmds[1]
-				setMovieWindow(source, m)
+		case "create":
+			if len(cmds) == 3 {
+				w := cmds[1]
+				v := cmds[2]
+				err := ikascrew.PlaySubWindow(w, v)
+				if err != nil {
+					fmt.Printf("Error:create command:%s\n", err)
+				} else {
+					source = w
+				}
+			} else {
+				fmt.Println("Error:create command arg 2[create {window} {movie}]")
 			}
-		case "source":
-			source = cmds[1]
+
 		case "q":
-			ikascrew.Release()
-			break
+			fmt.Println("\nByeBye?[Y/n]")
+			sc.Scan()
+			yN := sc.Text()
+			if yN == "Y" {
+				fmt.Println("Bye!")
+				ikascrew.Release()
+				os.Exit(0)
+			}
 		default:
 		}
 
 	}
-}
-
-func setMovieWindow(w, m string) {
-
-	win := ikascrew.GetWindow(w)
-	if win == nil {
-		fmt.Println("Error GetWindow:" + w)
-		return
-	}
-
-	video := ikascrew.NewBlendVideo("snow.mp4", "sumi.mp4")
-	go win.Play(video)
-
 }

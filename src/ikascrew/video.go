@@ -37,6 +37,10 @@ func NewVideo(f string) (*Video, error) {
 
 func (v *Video) Next() *opencv.IplImage {
 
+	if v.cap == nil {
+		return nil
+	}
+
 	img := v.cap.QueryFrame()
 	v.Position = int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
 
@@ -63,5 +67,8 @@ func (v *Video) Reload() {
 }
 
 func (v *Video) Release() {
-	v.cap.Release()
+	cp := v.cap
+	v.cap = nil
+
+	cp.Release()
 }
