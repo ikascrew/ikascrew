@@ -1,13 +1,10 @@
-// Copyright 2011 <chaishushan@gmail.com>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package ikascrew
 
 import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 	//"github.com/secondarykey/go-opencv/opencv"
 )
 
@@ -32,15 +29,20 @@ func Run(dir string) error {
 	for k, _ := range videos {
 		fmt.Println(k)
 	}
+
 	main := "ikascrew"
 	win := NewMainWindow(main)
 	windows[main] = win
 
-	video := NewMainVideo("default.mp4")
+	fmt.Println("OpenCL Init wait...")
+	time.Sleep(5000 * time.Millisecond)
+
+	video := NewMainVideo("snow.mp4")
 
 	go func() {
 		win.Play(video)
 	}()
+
 	return nil
 }
 
