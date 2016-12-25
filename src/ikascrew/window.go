@@ -7,22 +7,36 @@ import (
 func init() {
 }
 
-type Window interface {
-	View(*opencv.IplImage)
-	Play(Queue)
-	Destroy()
-}
-
-type ParentWindow struct {
-	q      Queue
+type Window struct {
+	q      *Queue
 	window *opencv.Window
 }
 
-func (w *ParentWindow) View(img *opencv.IplImage) {
-	w.window.ShowImage(img)
+func NewWindow(name string) *Window {
+	rtn := &Window{}
+	win := opencv.NewWindow(name)
+	rtn.window = win
+	return rtn
 }
 
-func (w *ParentWindow) Destroy() {
+func (w *Window) Play(q *Queue) {
+
+	w.q = q
+	for {
+
+		img := q.Next()
+		if img != nil {
+			w.window.ShowImage(img)
+			if q.stop {
+				opencv.WaitKey(0)
+				q.stop = false
+			}
+			opencv.WaitKey(q.Wait())
+		}
+	}
+}
+
+func (w *Window) Destroy() {
 	if w.q != nil {
 		w.q.Release()
 	}

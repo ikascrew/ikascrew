@@ -13,7 +13,7 @@ type Video struct {
 	Frames   int
 	Position int
 	cap      *opencv.Capture
-	file     string
+	File     string
 }
 
 func NewVideo(f string) (*Video, error) {
@@ -29,7 +29,7 @@ func NewVideo(f string) (*Video, error) {
 		FPS:    fps,
 		Frames: frames,
 		cap:    cap,
-		file:   f,
+		File:   f,
 	}
 
 	return v, nil
@@ -62,13 +62,20 @@ func (v *Video) Current() int {
 	return v.Position
 }
 
+func (v *Video) Set(f int) {
+
+	if f > v.Frames {
+		f = f % v.Frames
+	}
+
+	v.cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(f))
+}
+
 func (v *Video) Reload() {
-	v.cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(0))
+	v.Set(0)
 }
 
 func (v *Video) Release() {
 	cp := v.cap
-	v.cap = nil
-
 	cp.Release()
 }
