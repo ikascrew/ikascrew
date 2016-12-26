@@ -104,6 +104,7 @@ func (i *IkascrewServer) effectHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "{")
 	fmt.Fprintf(w, "\"success\" : %s,", success)
 	fmt.Fprintf(w, "\"message\" : \"%s\"", err)
+	fmt.Fprintf(w, "}")
 }
 
 func (i *IkascrewServer) pushHandler(w http.ResponseWriter, r *http.Request) {
