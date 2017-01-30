@@ -1,0 +1,134 @@
+body {
+  margin: 0;
+  background-color: #000;
+}
+
+a img{
+  border: 0px;
+}
+
+::-moz-selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+::selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+.ikascrew-header .mdl-menu__container {
+  z-index: 50;
+  margin: 0 !important;
+}
+
+.ikascrew-header {
+  overflow: visible;
+  background-color: #000;
+}
+
+.ikascrew-header .material-icons {
+  color: #767777 !important;
+}
+
+.ikascrew-header .mdl-layout__drawer-button {
+  background: transparent;
+  color: #767777;
+}
+
+.ikascrew-header .mdl-navigation__link {
+  color: #757575;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+
+.ikascrew-navigation {
+  direction: ltr;
+  -webkit-justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  width: 800px;
+}
+
+.ikascrew-navigation .mdl-navigation__link {
+  display: inline-block;
+  height: 60px;
+  line-height: 68px;
+  background-color: transparent !important;
+  border-bottom: 4px solid transparent;
+}
+
+.ikascrew-navigation .mdl-navigation__link:hover {
+  border-bottom: 4px solid #8bc34a;
+}
+
+.ikascrew-drawer {
+  border-right: none;
+}
+
+.ikascrew-drawer-separator {
+  height: 1px;
+  background-color: #dcdcdc;
+  margin: 8px 0;
+}
+
+.ikascrew-drawer .mdl-navigation__link.mdl-navigation__link {
+  font-size: 14px;
+  color: #757575;
+}
+
+.ikascrew-drawer span.mdl-navigation__link.mdl-navigation__link {
+  color: #8bc34a;
+}
+
+.ikascrew-drawer .mdl-layout-title {
+  position: relative;
+  background: #6ab344;
+  height: 160px;
+}
+
+.ikascrew-drawer .ikascrew-logo-image {
+  position: absolute;
+  bottom: 16px;
+}
+
+.ikascrew-mobile-title {
+  display: block !important;
+  position: absolute;
+  left: calc(50% - 70px);
+  top: 12px;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mdl-card__title-text {
+    text-shadow:
+        0px -1px #aaa,
+        1px 0px #555,
+        0px 1px #aaa,
+        -1px 1px #555;
+}
+
+.ikascrew-card-wide.mdl-card {
+  width: 512px;
+  min-height:50px;
+  margin:auto;
+}
+
+.mdl-card__supporting-text {
+}
+
+.ikascrew-card-wide > .mdl-card__title {
+  color: #fff;
+}
+.ikascrew-card-wide > .mdl-card__menu {
+  color: #000;
+}
+
+.material-icons {
+    text-shadow:
+        0px -1px #aaa,
+        1px 0px #555,
+        0px 1px #aaa,
+        -1px 1px #555;
+}
