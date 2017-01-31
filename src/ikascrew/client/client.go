@@ -1,15 +1,12 @@
 package client
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	_ "net/http/pprof"
 	"net/url"
-	"os"
-	"strings"
 	"time"
 
 	"ikascrew"
@@ -18,6 +15,7 @@ import (
 
 func init() {
 	fmt.Println("########################## Starting ikascrew Client")
+
 }
 
 type ikascrewClient struct {
@@ -57,7 +55,114 @@ func Start(d string) error {
 		win.Play(q)
 	}()
 
-	return ika.input()
+	http.HandleFunc("/info", ika.infoHandler)
+	http.HandleFunc("/sync", ika.syncHandler)
+
+	http.HandleFunc("/load", ika.loadHandler)
+	http.HandleFunc("/push", ika.pushHandler)
+	http.HandleFunc("/switch", ika.switchHandler)
+
+	http.HandleFunc("/effect", ika.effectHandler)
+
+	http.HandleFunc("/remote", ika.remoteHandler)
+
+	http.Handle("/", http.FileServer(http.Dir(d+"/.public/")))
+
+	return http.ListenAndServe(":5005", nil)
+}
+
+func (c *ikascrewClient) infoHandler(w http.ResponseWriter, r *http.Request) {
+	err := c.info()
+	if err != nil {
+		fmt.Println("Error Info:", err)
+	}
+
+	fmt.Println("Info Done")
+}
+
+func (c *ikascrewClient) syncHandler(w http.ResponseWriter, r *http.Request) {
+	err := c.sync()
+	if err != nil {
+		fmt.Println("Error Sync:", err)
+	}
+	fmt.Println("Sync Done")
+}
+
+func (c *ikascrewClient) effectHandler(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+	name := r.FormValue("name")
+
+	err := c.effect(name)
+	if err != nil {
+		fmt.Println("Error Effect:", err)
+	}
+	fmt.Println("Effect Done")
+}
+
+func (c *ikascrewClient) switchHandler(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+	name := r.FormValue("name")
+
+	err := c.switchVideo(name)
+	if err != nil {
+		fmt.Println("Error Switch:", err)
+	}
+
+	fmt.Println("Switch Done")
+}
+
+func (c *ikascrewClient) pushHandler(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+	name := r.FormValue("name")
+
+	err := c.push(name)
+	if err != nil {
+		fmt.Println("Error Push:", err)
+	}
+}
+
+func (c *ikascrewClient) loadHandler(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+	name := r.FormValue("name")
+
+	err := c.load(name)
+	if err != nil {
+		fmt.Println("Error Load:", err)
+	}
+}
+
+func (c *ikascrewClient) remoteHandler(w http.ResponseWriter, r *http.Request) {
+
+	cmd := make([]string, 0)
+
+	r.ParseForm()
+	remoteCmd := r.FormValue("cmd")
+	name := r.FormValue("name")
+
+	cmd = append(cmd, remoteCmd)
+	if name != "" {
+		cmd = append(cmd, name)
+	}
+
+	err := c.remote(cmd)
+	if err != nil {
+		fmt.Println("Error remote:", err)
+	}
+}
+
+func (c *ikascrewClient) switchVideo(e string) error {
+	if e != "" {
+		v, err := ikascrew.GetVideo(e)
+		if err != nil {
+			return err
+		}
+		return c.q.EffectSwitch(v)
+	}
+	return c.q.Switch(200)
 }
 
 func (c *ikascrewClient) info() error {
@@ -175,104 +280,6 @@ func (c *ikascrewClient) ls() error {
 	return nil
 }
 
-func (c *ikascrewClient) input() error {
-
-	var sc = bufio.NewScanner(os.Stdin)
-	for {
-		fmt.Print("ikascrew> ")
-		sc.Scan()
-		cmd := sc.Text()
-		cmds := strings.Split(cmd, " ")
-
-		switch cmds[0] {
-		case "info":
-			err := c.info()
-			if err != nil {
-				fmt.Println("Error Information:", err)
-			}
-		case "sync":
-			err := c.sync()
-			if err != nil {
-				fmt.Println("Error Sync:", err)
-			}
-		case "ls":
-			err := c.ls()
-			if err != nil {
-				fmt.Println("Error Ls:", err)
-			}
-		case "effect":
-			if len(cmds) < 2 {
-				fmt.Println("Error Effect Arg length 2")
-			} else {
-				err := c.effect(cmds[1])
-				if err != nil {
-					fmt.Println("Error Effect:", err)
-				}
-			}
-		case "switch":
-			name := ""
-			if len(cmds) >= 2 {
-				name = cmds[1]
-			}
-
-			err := c.switchVideo(name)
-			if err != nil {
-				fmt.Println("Error Switch:", err)
-			}
-		case "push":
-			if len(cmds) < 2 {
-				fmt.Println("Error Push Arg length 2")
-			} else {
-				err := c.push(cmds[1])
-				if err != nil {
-					fmt.Println("Error Push:", err)
-				}
-			}
-		case "load":
-			if len(cmds) < 2 {
-				fmt.Println("Error Load Arg length 2")
-			} else {
-				err := c.load(cmds[1])
-				if err != nil {
-					fmt.Println("Error Load:", err)
-				}
-			}
-		case "remote":
-			if len(cmds) < 2 {
-				fmt.Println("Error Remote Arg length 2")
-			} else {
-				err := c.remote(cmds[1:])
-				if err != nil {
-					fmt.Println("Error remote:", err)
-				}
-			}
-		case "q":
-			in := c.quit()
-			if in == "Y" {
-				fmt.Println("Bye!")
-				return nil
-			}
-		case "":
-		default:
-			fmt.Println("Command Not Found:" + cmds[0])
-		}
-
-	}
-	return nil
-}
-
-func (c *ikascrewClient) switchVideo(e string) error {
-
-	if e != "" {
-		v, err := ikascrew.GetVideo(e)
-		if err != nil {
-			return err
-		}
-		return c.q.EffectSwitch(v)
-	}
-	return c.q.Switch(200)
-}
-
 func (c *ikascrewClient) effect(f string) error {
 	v, err := ikascrew.GetVideo(f)
 	if err != nil {
@@ -315,12 +322,4 @@ func (c *ikascrewClient) load(f string) error {
 
 	c.q.Set(v, 0)
 	return nil
-}
-
-func (c *ikascrewClient) quit() string {
-	var sc = bufio.NewScanner(os.Stdin)
-	fmt.Println("\nByeBye?[Y/n]")
-	sc.Scan()
-	yN := sc.Text()
-	return yN
 }

@@ -20,7 +20,7 @@ func main() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
 
-	err := server.Start("setting/20161226", "opening.mp4")
+	err := server.Start("setting/20170131", "opening.mp4")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

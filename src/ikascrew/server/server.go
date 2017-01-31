@@ -28,13 +28,13 @@ type IkascrewServer struct {
 	q *ikascrew.Queue
 }
 
-var address = "localhost:5555"
+const ADDRESS = "localhost:5555"
 
 func init() {
 }
 
 func Address() string {
-	return address
+	return ADDRESS
 }
 
 func Start(d, f string) error {
@@ -68,7 +68,7 @@ func Start(d, f string) error {
 	http.HandleFunc("/switch", ika.switchHandler)
 	http.HandleFunc("/effect", ika.effectHandler)
 	http.HandleFunc("/info", ika.informationHandler)
-	return http.ListenAndServe(address, nil)
+	return http.ListenAndServe(ADDRESS, nil)
 }
 
 func (i *IkascrewServer) syncHandler(w http.ResponseWriter, r *http.Request) {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
@@ -12,10 +13,16 @@ import (
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
+type Movie struct {
+	Name  string
+	Image string
+}
+
 func main() {
 
-	dir := "setting/20161226"
-	thumb := dir + "/thumb"
+	dir := "setting/20170131"
+	public := dir + "/.public"
+	thumb := public + "/thumb"
 
 	err := os.MkdirAll(thumb, 0777)
 	if err != nil {
@@ -29,11 +36,20 @@ func main() {
 		return
 	}
 
+	movies := make([]Movie, len(files))
+
 	bar := pb.StartNew(len(files)).Prefix("Create Thumbnail")
-	for _, f := range files {
+	for idx, f := range files {
+
+		movie := Movie{}
 
 		work := strings.Replace(f, dir, "", 1)
+
 		jpg := strings.Replace(work, ".mp4", ".jpg", 1)
+
+		movie.Name = string(work[1:])
+		movie.Image = "thumb" + jpg
+
 		out := thumb + jpg
 
 		mkIdx := strings.LastIndex(out, "/")
@@ -46,9 +62,32 @@ func main() {
 			fmt.Println("Error Create Thumbnail:", err)
 			os.Exit(1)
 		}
+
+		movies[idx] = movie
 		bar.Increment()
 	}
 	bar.FinishPrint("Complate!")
+
+	//template
+	tmpl, err := template.ParseFiles("index.tmpl")
+	if err != nil {
+		fmt.Println("Error Create Template:", err)
+		os.Exit(1)
+	}
+
+	index, err := os.Create(public + "/index.html")
+	if err != nil {
+		fmt.Println("Error Create index:", err)
+		os.Exit(1)
+	}
+
+	err = tmpl.Execute(index, movies)
+	if err != nil {
+		fmt.Println("Error Create Index:", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Done!")
 	return
 }
 
