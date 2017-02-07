@@ -6,10 +6,10 @@ import (
 )
 
 type Queue struct {
-	V1           *Video
-	V2           *Video
-	current      *Video
-	effect       *Video
+	V1           Video
+	V2           Video
+	current      Video
+	effect       Video
 	img          *opencv.IplImage
 	stop         bool
 	switchCount  int
@@ -56,14 +56,14 @@ func NewSourceQueue(src string, f int) (*Queue, error) {
 	return rtn, nil
 }
 
-func (q *Queue) EffectSwitch(v *Video) error {
+func (q *Queue) EffectSwitch(v Video) error {
 
 	if q.V2 == nil {
 		return fmt.Errorf("Switch need V2 video")
 	}
 
 	q.switchCount = 1
-	q.switchNumber = v.Frames
+	q.switchNumber = v.Size()
 	q.effect = v
 	return nil
 }
@@ -112,14 +112,14 @@ func (q *Queue) Next() *opencv.IplImage {
 	} else if q.effect != nil {
 		img2 := q.effect.Next()
 
-		alpha := float64(q.effect.Current()) / float64(q.effect.Frames)
-		if q.effect.Current() > q.effect.Frames/2 {
-			alpha = float64(q.effect.Frames-q.effect.Current()) / float64(q.effect.Frames)
+		alpha := float64(q.effect.Current()) / float64(q.effect.Size())
+		if q.effect.Current() > q.effect.Size()/2 {
+			alpha = float64(q.effect.Size()-q.effect.Current()) / float64(q.effect.Size())
 		}
 
 		opencv.AddWeighted(img2, float64(alpha), img, float64(1.0-alpha), 0.0, q.img)
 
-		if q.effect.Current() == q.effect.Frames {
+		if q.effect.Current() == q.effect.Size() {
 			q.effect = nil
 		}
 		return q.img
@@ -129,12 +129,12 @@ func (q *Queue) Next() *opencv.IplImage {
 
 }
 
-func (q *Queue) Effect(v *Video) {
+func (q *Queue) Effect(v Video) {
 	q.effect = v
 	return
 }
 
-func (q *Queue) Sub(v *Video) {
+func (q *Queue) Sub(v Video) {
 	q.V2 = v
 	return
 }
@@ -153,7 +153,7 @@ func (q *Queue) Name() (string, string) {
 	return v1Name, v2Name
 }
 
-func (q *Queue) Set(v *Video, f int) {
+func (q *Queue) Set(v Video, f int) {
 
 	v.Set(f)
 	q.V1, q.V2, q.current = v, q.current, v
@@ -178,5 +178,5 @@ func (q *Queue) Release() {
 }
 
 func (q *Queue) Source() string {
-	return q.current.File
+	return q.current.Source()
 }

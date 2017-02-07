@@ -8,11 +8,11 @@ import (
 )
 
 var project string
-var videos map[string]*Video
+var videos map[string]Video
 
 func init() {
 	project = ""
-	videos = make(map[string]*Video)
+	videos = make(map[string]Video)
 }
 
 func PrintVideos() {
@@ -23,7 +23,7 @@ func PrintVideos() {
 	fmt.Printf("#######################################\n")
 }
 
-func GetSource(name string) (*Video, error) {
+func GetSource(name string) (Video, error) {
 
 	if strings.LastIndex(name, ".mp4") == -1 {
 		name = name + ".mp4"
@@ -37,7 +37,7 @@ func GetSource(name string) (*Video, error) {
 	return v, nil
 }
 
-func GetVideo(name string) (*Video, error) {
+func GetVideo(name string) (Video, error) {
 	return GetSource(project + "/" + name)
 }
 
@@ -75,7 +75,7 @@ func Loading(name string) error {
 		} else {
 			idx := strings.LastIndex(fname, ".mp4")
 			if idx == len(fname)-4 {
-				v, err := NewVideo(name + "/" + fname)
+				v, err := NewFile(name + "/" + fname)
 				if err != nil {
 					return fmt.Errorf("Error New Video:%s", err)
 				}
