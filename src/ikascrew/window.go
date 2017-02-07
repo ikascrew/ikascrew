@@ -27,10 +27,12 @@ func (w *Window) Play(q *Queue) {
 		img := q.Next()
 		if img != nil {
 			w.window.ShowImage(img)
-			if q.stop {
-				opencv.WaitKey(0)
-				q.stop = false
-			}
+			/*
+				if q.stop {
+					opencv.WaitKey(0)
+					q.stop = false
+				}
+			*/
 			opencv.WaitKey(q.Wait())
 		}
 	}

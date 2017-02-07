@@ -37,7 +37,7 @@ func Address() string {
 	return ADDRESS
 }
 
-func Start(d, f string) error {
+func Start(d string) error {
 
 	project := d
 	err := ikascrew.Loading(project)
@@ -47,7 +47,7 @@ func Start(d, f string) error {
 
 	ikascrew.PrintVideos()
 
-	q, err := ikascrew.NewQueue(f)
+	q, err := ikascrew.NewQueue()
 	if err != nil {
 		return fmt.Errorf("Error New Queue:%s", err)
 	}
@@ -57,7 +57,7 @@ func Start(d, f string) error {
 	}
 
 	win := ikascrew.NewWindow("ikascrew")
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(900 * time.Millisecond)
 
 	go func() {
 		win.Play(q)

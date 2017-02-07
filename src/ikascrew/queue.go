@@ -16,8 +16,12 @@ type Queue struct {
 	switchNumber int
 }
 
-func NewQueue(src string) (*Queue, error) {
-	v1, err := GetVideo(src)
+func NewQueue() (*Queue, error) {
+
+	t := make([]string, 1)
+	t[0] = "表示する日本語"
+
+	v1, err := NewPhrase(t)
 	if err != nil {
 		return nil, err
 	}

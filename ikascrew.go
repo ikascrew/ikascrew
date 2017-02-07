@@ -41,7 +41,7 @@ func main() {
 	case "init":
 		err = create(project)
 	case "server":
-		err = server.Start(project, "opening.mp4")
+		err = server.Start(project)
 	case "client":
 		err = client.Start(project)
 	default:

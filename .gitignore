@@ -2,5 +2,5 @@
 *.avi
 *.mp4
 .*
-setting/*
+projects/*
 pkg/*
