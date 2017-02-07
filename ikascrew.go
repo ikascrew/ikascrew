@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"image/jpeg"
@@ -8,6 +9,9 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"ikascrew/client"
+	"ikascrew/server"
 
 	"github.com/secondarykey/go-opencv/opencv"
 	"gopkg.in/cheggaaa/pb.v1"
@@ -20,20 +24,57 @@ type Movie struct {
 
 func main() {
 
-	dir := "setting/20170131"
+	flag.Parse()
+
+	args := flag.Args()
+	l := len(args)
+	if l != 2 {
+		fmt.Println("Error:ikascrew 2 arg")
+		os.Exit(1)
+	}
+
+	cmd := args[0]
+	project := args[1]
+	var err error
+
+	switch cmd {
+	case "init":
+		err = create(project)
+	case "server":
+		err = server.Start(project, "opening.mp4")
+	case "client":
+		err = client.Start(project)
+	default:
+		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Done!")
+	os.Exit(0)
+}
+
+func create(dir string) error {
+
 	public := dir + "/.public"
 	thumb := public + "/thumb"
+	images := public + "/images"
 
 	err := os.MkdirAll(thumb, 0777)
 	if err != nil {
-		fmt.Println("Error make directory:", thumb)
-		return
+		return fmt.Errorf("Error make directory:%s", thumb)
+	}
+	err = os.MkdirAll(images, 0777)
+	if err != nil {
+		return fmt.Errorf("Error make directory:%s", images)
 	}
 
 	files, err := search(dir)
 	if err != nil {
-		fmt.Println("Error directory search:", err)
-		return
+		return fmt.Errorf("Error directory search:%s", err)
 	}
 
 	movies := make([]Movie, len(files))
@@ -59,36 +100,52 @@ func main() {
 
 		err = createThumbnail(f, out, 5)
 		if err != nil {
-			fmt.Println("Error Create Thumbnail:", err)
-			os.Exit(1)
+			return fmt.Errorf("Error Create Thumbnail:%s", err)
 		}
 
 		movies[idx] = movie
 		bar.Increment()
 	}
-	bar.FinishPrint("Complate!")
+	bar.FinishPrint("Thumbnail Completion")
 
-	//template
-	tmpl, err := template.ParseFiles("index.tmpl")
+	bar = pb.StartNew(4).Prefix("Generate Controll page")
+	tmpl, err := template.ParseFiles("templates/index.tmpl")
 	if err != nil {
-		fmt.Println("Error Create Template:", err)
-		os.Exit(1)
+		return fmt.Errorf("Error Create Template:%s", err)
 	}
 
 	index, err := os.Create(public + "/index.html")
 	if err != nil {
-		fmt.Println("Error Create index:", err)
-		os.Exit(1)
+		return fmt.Errorf("Error Create index:%s", err)
 	}
 
 	err = tmpl.Execute(index, movies)
 	if err != nil {
-		fmt.Println("Error Create Index:", err)
-		os.Exit(1)
+		return fmt.Errorf("Error Create Index:%s", err)
 	}
+	bar.Increment()
 
-	fmt.Println("Done!")
-	return
+	err = copyFile("templates/styles.css", public+"/styles.css")
+	if err != nil {
+		return fmt.Errorf("Error Copy:%s", err)
+	}
+	bar.Increment()
+
+	err = copyFile("templates/images/logo.png", images+"/logo.png")
+	if err != nil {
+		return fmt.Errorf("Error Copy:%s", err)
+	}
+	bar.Increment()
+
+	err = copyFile("templates/jquery-3.1.1.min.js", public+"/jquery-3.1.1.min.js")
+	if err != nil {
+		return fmt.Errorf("Error Copy:%s", err)
+	}
+	bar.Increment()
+
+	bar.FinishPrint("Controller Completion")
+
+	return nil
 }
 
 func search(d string) ([]string, error) {
@@ -189,6 +246,19 @@ func createThumbnail(in, out string, cut int) error {
 	if err = jpeg.Encode(outFile, img, option); err != nil {
 		return fmt.Errorf("Error Encode:%s", err)
 	}
+	return nil
+}
 
+func copyFile(src, dst string) error {
+	// read the whole file at once
+	b, err := ioutil.ReadFile(src)
+	if err != nil {
+		return fmt.Errorf("Error:Read File %s", src)
+	}
+
+	err = ioutil.WriteFile(dst, b, 0644)
+	if err != nil {
+		return fmt.Errorf("Error:Write File %s", dst)
+	}
 	return nil
 }

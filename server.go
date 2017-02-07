@@ -15,12 +15,6 @@ func init() {
 
 func main() {
 
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
-
-	err := server.Start("setting/20170131", "opening.mp4")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
