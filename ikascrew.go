@@ -108,6 +108,11 @@ func create(dir string) error {
 	}
 	bar.FinishPrint("Thumbnail Completion")
 
+	tw := Movie{
+		Name: "_ikascrew_Twitter.mp4",
+	}
+	movies = append(movies, tw)
+
 	bar = pb.StartNew(4).Prefix("Generate Controll page")
 	tmpl, err := template.ParseFiles("templates/index.tmpl")
 	if err != nil {

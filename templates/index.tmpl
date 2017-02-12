@@ -47,13 +47,11 @@
 
   <div class="mdl-card__supporting-text">
 
-      FPS:30 FRAME:40 
-
-      <button id="remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="" data-cmd="switch">
+      <button id="{{.Name}}-remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="" data-cmd="switch">
           <i class="material-icons right-section"> autorenew</i>
       </button>
 
-      <button id="remote-effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="{{.Name}}" data-cmd="effect">
+      <button id="{{.Name}}-remote-effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="{{.Name}}" data-cmd="effect">
           <i class="material-icons right-section"> tab_unselected</i>
       </button>
 
@@ -61,29 +59,29 @@
 
   <div class="mdl-card__menu">
 
-      <button id="load" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="load" data-name="{{.Name}}">
+      <button id="{{.Name}}-load" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="load" data-name="{{.Name}}">
       <i class="material-icons">backup</i>
     </button>
 
-    <button id="push" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="push" data-name="{{.Name}}">
+    <button id="{{.Name}}-push" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="push" data-name="{{.Name}}">
       <i class="material-icons">settings_backup_restore</i>
     </button>
 
-    <button id="switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="switch" data-name="{{.Name}}">
+    <button id="{{.Name}}-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="switch" data-name="{{.Name}}">
       <i class="material-icons">autorenew</i>
     </button>
 
-    <button id="effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="effect" data-name="{{.Name}}">
+    <button id="{{.Name}}-effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="effect" data-name="{{.Name}}">
       <i class="material-icons">tab_unselected</i>
     </button>
 
-    <div class="mdl-tooltip mdl-tooltip--large" for="remote-switch">Switch</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="remote-effect">Effect</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-remote-switch">Switch</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-remote-effect">Effect</div>
 
-    <div class="mdl-tooltip mdl-tooltip--large" for="load">Load</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="push">Push</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="switch">Switch</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="effect">Effect</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-load">Load</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-push">Push</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-switch">Switch</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-effect">Effect</div>
 
   </div>
 </div>

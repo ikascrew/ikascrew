@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"ikascrew"
 	"net/http"
+	"runtime"
 	"time"
+
+	"github.com/google/gops/agent"
 )
 
 type Sync struct {
@@ -39,6 +42,12 @@ func Address() string {
 
 func Start(d string) error {
 
+	if err := agent.Listen(nil); err != nil {
+		return err
+	}
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	project := d
 	err := ikascrew.Loading(project)
 	if err != nil {
@@ -57,7 +66,7 @@ func Start(d string) error {
 	}
 
 	win := ikascrew.NewWindow("ikascrew")
-	time.Sleep(900 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 
 	go func() {
 		win.Play(q)
@@ -115,6 +124,15 @@ func (i *IkascrewServer) pushHandler(w http.ResponseWriter, r *http.Request) {
 	next := r.FormValue("next")
 
 	fmt.Printf("[%s]\n", next)
+
+	if next == "_ikascrew_Twitter.mp4" {
+		v, err := ikascrew.NewTwitter()
+		if err == nil {
+			ikascrew.SetVideo(next, v)
+		} else {
+			fmt.Printf("[%s]\n", err)
+		}
+	}
 
 	v, err := ikascrew.GetVideo(next)
 	if err != nil {

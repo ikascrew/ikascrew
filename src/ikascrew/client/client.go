@@ -28,6 +28,8 @@ func Start(d string) error {
 		return err
 	}
 
+	ikascrew.PrintVideos()
+
 	ika := &ikascrewClient{}
 	s, err := ika.getSync()
 	if err != nil {

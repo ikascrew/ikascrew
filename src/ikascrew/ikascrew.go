@@ -38,14 +38,22 @@ func GetSource(name string) (Video, error) {
 }
 
 func GetVideo(name string) (Video, error) {
-	return GetSource(project + "/" + name)
+	v, err := GetSource(project + "/" + name)
+	if err != nil {
+		v, err = GetSource(name)
+	}
+	return v, err
+}
+
+func SetVideo(name string, v Video) {
+	videos[name] = v
 }
 
 func List() []string {
+
 	rtn := make([]string, 0)
 	for key, _ := range videos {
 		d := strings.Replace(key, project+"/", "", 1)
-
 		rtn = append(rtn, d)
 	}
 
@@ -58,6 +66,7 @@ func Loading(name string) error {
 	if project == "" {
 		project = name
 		fmt.Println("Project Name:", project)
+		loadPlugin()
 	}
 
 	fileInfos, err := ioutil.ReadDir(name)
@@ -84,4 +93,9 @@ func Loading(name string) error {
 		}
 	}
 	return nil
+}
+
+func loadPlugin() {
+	p, _ := NewTwitter()
+	videos[p.Source()] = p
 }

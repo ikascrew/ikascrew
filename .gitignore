@@ -4,3 +4,5 @@
 .*
 projects/*
 pkg/*
+app.json
+bin/*
