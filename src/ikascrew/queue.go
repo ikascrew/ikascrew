@@ -18,7 +18,7 @@ type Queue struct {
 
 func NewQueue() (*Queue, error) {
 
-	v1 := videos["_ikascrew_Twitter.mp4"]
+	v1 := videos["_ikascrew_Image.mp4"]
 
 	dst := opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
 	rtn := &Queue{

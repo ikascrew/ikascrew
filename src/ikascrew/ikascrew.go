@@ -98,4 +98,6 @@ func Loading(name string) error {
 func loadPlugin() {
 	p, _ := NewTwitter()
 	videos[p.Source()] = p
+	img, _ := NewImage()
+	videos[img.Source()] = img
 }
