@@ -1,269 +1,103 @@
-package main
+package ikascrew
 
 import (
-	"flag"
 	"fmt"
-	"html/template"
-	"image/jpeg"
 	"io/ioutil"
-	"os"
 	"sort"
 	"strings"
-
-	"ikascrew/client"
-	"ikascrew/server"
-
-	"github.com/secondarykey/go-opencv/opencv"
-	"gopkg.in/cheggaaa/pb.v1"
 )
 
-type Movie struct {
-	Name  string
-	Image string
+var project string
+var videos map[string]Video
+
+func init() {
+	project = ""
+	videos = make(map[string]Video)
 }
 
-func main() {
-
-	flag.Parse()
-
-	args := flag.Args()
-	l := len(args)
-	if l != 2 {
-		fmt.Println("Error:ikascrew 2 arg")
-		os.Exit(1)
+func PrintVideos() {
+	fmt.Printf("############################### %s\n", project)
+	for k, _ := range videos {
+		fmt.Println(k)
 	}
-
-	cmd := args[0]
-	project := args[1]
-	var err error
-
-	switch cmd {
-	case "init":
-		err = create(project)
-	case "server":
-		err = server.Start(project)
-	case "client":
-		err = client.Start(project)
-	default:
-		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
-	}
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	fmt.Println("Done!")
-	os.Exit(0)
+	fmt.Printf("#######################################\n")
 }
 
-func create(dir string) error {
+func GetSource(name string) (Video, error) {
 
-	public := dir + "/.public"
-	thumb := public + "/thumb"
-	images := public + "/images"
-
-	err := os.MkdirAll(thumb, 0777)
-	if err != nil {
-		return fmt.Errorf("Error make directory:%s", thumb)
-	}
-	err = os.MkdirAll(images, 0777)
-	if err != nil {
-		return fmt.Errorf("Error make directory:%s", images)
+	if strings.LastIndex(name, ".mp4") == -1 {
+		name = name + ".mp4"
 	}
 
-	files, err := search(dir)
-	if err != nil {
-		return fmt.Errorf("Error directory search:%s", err)
+	v, flg := videos[name]
+	if !flg {
+		return nil, fmt.Errorf("%s not Found", name)
 	}
 
-	movies := make([]Movie, len(files))
-
-	bar := pb.StartNew(len(files)).Prefix("Create Thumbnail")
-	for idx, f := range files {
-
-		movie := Movie{}
-
-		work := strings.Replace(f, dir, "", 1)
-
-		jpg := strings.Replace(work, ".mp4", ".jpg", 1)
-
-		movie.Name = string(work[1:])
-		movie.Image = "thumb" + jpg
-
-		out := thumb + jpg
-
-		mkIdx := strings.LastIndex(out, "/")
-		tmp := string(out[:mkIdx])
-
-		err = os.MkdirAll(tmp, 0777)
-
-		err = createThumbnail(f, out, 5)
-		if err != nil {
-			return fmt.Errorf("Error Create Thumbnail:%s", err)
-		}
-
-		movies[idx] = movie
-		bar.Increment()
-	}
-	bar.FinishPrint("Thumbnail Completion")
-
-	tw := Movie{
-		Name: "_ikascrew_Twitter.mp4",
-	}
-	movies = append(movies, tw)
-
-	bar = pb.StartNew(4).Prefix("Generate Controll page")
-	tmpl, err := template.ParseFiles("templates/index.tmpl")
-	if err != nil {
-		return fmt.Errorf("Error Create Template:%s", err)
-	}
-
-	index, err := os.Create(public + "/index.html")
-	if err != nil {
-		return fmt.Errorf("Error Create index:%s", err)
-	}
-
-	err = tmpl.Execute(index, movies)
-	if err != nil {
-		return fmt.Errorf("Error Create Index:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/styles.css", public+"/styles.css")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/images/logo.png", images+"/logo.png")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/jquery-3.1.1.min.js", public+"/jquery-3.1.1.min.js")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	bar.FinishPrint("Controller Completion")
-
-	return nil
+	return v, nil
 }
 
-func search(d string) ([]string, error) {
-	fileInfos, err := ioutil.ReadDir(d)
+func GetVideo(name string) (Video, error) {
+	v, err := GetSource(project + "/" + name)
 	if err != nil {
-		return nil, fmt.Errorf("Error:Read Dir[%s]", d)
+		v, err = GetSource(name)
 	}
+	return v, err
+}
+
+func SetVideo(name string, v Video) {
+	videos[name] = v
+}
+
+func List() []string {
 
 	rtn := make([]string, 0)
-	for _, f := range fileInfos {
-		fname := f.Name()
-		if f.IsDir() {
-			files, err := search(d + "/" + fname)
-			if err != nil {
-				return nil, err
-			}
-			rtn = append(rtn, files...)
-		} else {
-			idx := strings.LastIndex(fname, ".mp4")
-			if idx == len(fname)-4 {
-				rtn = append(rtn, d+"/"+fname)
-			}
-		}
+	for key, _ := range videos {
+		d := strings.Replace(key, project+"/", "", 1)
+		rtn = append(rtn, d)
 	}
 
 	sort.Strings(rtn)
-	return rtn, nil
+	return rtn
 }
 
-func createThumbnail(in, out string, cut int) error {
+func Loading(name string) error {
 
-	// load movie
-	cap := opencv.NewFileCapture(in)
-	if cap == nil {
-		return fmt.Errorf("New Capture Error:[%s]", in)
+	if project == "" {
+		project = name
+		fmt.Println("Project Name:", project)
+		loadPlugin()
 	}
-	defer cap.Release()
 
-	frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
-	mod := frames / cut
+	fileInfos, err := ioutil.ReadDir(name)
+	if err != nil {
+		return err
+	}
 
-	images := make([]*opencv.IplImage, cut+1)
-	width := 0
-	height := 0
-
-	// get thumb
-	frame := 0
-	for idx := 0; idx < len(images); idx++ {
-
-		img := cap.QueryFrame()
-		for img == nil {
-			frame = frame - 5
-			cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
-			img = cap.QueryFrame()
+	for _, f := range fileInfos {
+		fname := f.Name()
+		if f.IsDir() {
+			err = Loading(name + "/" + fname)
+			if err != nil {
+				return err
+			}
+		} else {
+			idx := strings.LastIndex(fname, ".mp4")
+			if idx == len(fname)-4 {
+				v, err := NewFile(name + "/" + fname)
+				if err != nil {
+					return fmt.Errorf("Error New Video:%s", err)
+				}
+				videos[name+"/"+fname] = v
+			}
 		}
-		images[idx] = img.Clone()
-
-		width += img.Width()
-		height = img.Height()
-
-		frame = mod * (idx + 1)
-		cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
-	}
-
-	//create thumb
-
-	thumb := opencv.CreateImage(width, height, opencv.IPL_DEPTH_8U, 3)
-	defer thumb.Release()
-	left := 0
-
-	for _, elm := range images {
-
-		defer elm.Release()
-
-		var rect opencv.Rect
-		rect.Init(left, 0, elm.Width(), elm.Height())
-
-		thumb.SetROI(rect)
-		opencv.Copy(elm, thumb, nil)
-
-		left += elm.Width()
-	}
-
-	//generate thumb
-
-	l := len(images)
-	thumb.ResetROI()
-	resize := opencv.Resize(thumb, int(left/l/2), int(height/l/2), opencv.CV_INTER_LINEAR)
-	img := resize.ToImage()
-
-	outFile, err := os.Create(out)
-	if err != nil {
-		return fmt.Errorf("Error OpenFile[%s]:%s", out, err)
-	}
-	defer outFile.Close()
-
-	option := &jpeg.Options{Quality: 100}
-	if err = jpeg.Encode(outFile, img, option); err != nil {
-		return fmt.Errorf("Error Encode:%s", err)
 	}
 	return nil
 }
 
-func copyFile(src, dst string) error {
-	// read the whole file at once
-	b, err := ioutil.ReadFile(src)
-	if err != nil {
-		return fmt.Errorf("Error:Read File %s", src)
-	}
-
-	err = ioutil.WriteFile(dst, b, 0644)
-	if err != nil {
-		return fmt.Errorf("Error:Write File %s", dst)
-	}
-	return nil
+func loadPlugin() {
+	p, _ := NewTwitter()
+	videos[p.Source()] = p
+	img, _ := NewImage()
+	videos[img.Source()] = img
 }

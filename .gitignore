@@ -2,7 +2,7 @@
 *.avi
 *.mp4
 .*
-projects/*
 pkg/*
-app.json
 bin/*
+cmd/projects/*
+cmd/app.json
