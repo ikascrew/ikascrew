@@ -2,20 +2,17 @@
 
 ## Install
 
-git clone https://github.com/secondarykey/ikascrew
+go install github.com/secondarykey/ikascrew/cmd
 
-cd ikascrew
-
-GOPATH=`pwd`
 
 ## Create Project
 
-go run ikascrew.go init [project]
+ikascrew init [project]
 
 ## Use
 
-go run ikascrew.go server [project]
+ikascrew server [project]
 
-go run ikascrew.go client [project]
+ikascrew client
 
 localhost:5005

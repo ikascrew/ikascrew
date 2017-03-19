@@ -7,10 +7,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"net/url"
-	"time"
 
-	"ikascrew"
-	"ikascrew/server"
+	"github.com/secondarykey/ikascrew"
+	"github.com/secondarykey/ikascrew/server"
 )
 
 func init() {
@@ -21,20 +20,19 @@ type ikascrewClient struct {
 	q *ikascrew.Queue
 }
 
-func Start(d string) error {
-
-	err := ikascrew.Loading(d)
-	if err != nil {
-		return err
-	}
-
-	ikascrew.PrintVideos()
+func Start() error {
 
 	ika := &ikascrewClient{}
 	s, err := ika.getSync()
 	if err != nil {
 		return err
 	}
+
+	err = ikascrew.Loading(s.Project)
+	if err != nil {
+		return err
+	}
+	ikascrew.PrintVideos()
 
 	q, err := ikascrew.NewSourceQueue(s.V1, s.Frame+500)
 	if err != nil {
@@ -50,26 +48,24 @@ func Start(d string) error {
 
 	ika.q = q
 
-	win := ikascrew.NewWindow("ikascrew client")
-	time.Sleep(300 * time.Millisecond)
+	win := ikascrew.NewWindow("ikascrew client", q)
 	go func() {
-		win.Play(q)
+		http.HandleFunc("/info", ika.infoHandler)
+		http.HandleFunc("/sync", ika.syncHandler)
+
+		http.HandleFunc("/load", ika.loadHandler)
+		http.HandleFunc("/push", ika.pushHandler)
+		http.HandleFunc("/switch", ika.switchHandler)
+
+		http.HandleFunc("/effect", ika.effectHandler)
+
+		http.HandleFunc("/remote", ika.remoteHandler)
+		http.Handle("/", http.FileServer(http.Dir(s.Project+"/.public/")))
+
+		http.ListenAndServe(":5005", nil)
 	}()
-
-	http.HandleFunc("/info", ika.infoHandler)
-	http.HandleFunc("/sync", ika.syncHandler)
-
-	http.HandleFunc("/load", ika.loadHandler)
-	http.HandleFunc("/push", ika.pushHandler)
-	http.HandleFunc("/switch", ika.switchHandler)
-
-	http.HandleFunc("/effect", ika.effectHandler)
-
-	http.HandleFunc("/remote", ika.remoteHandler)
-
-	http.Handle("/", http.FileServer(http.Dir(d+"/.public/")))
-
-	return http.ListenAndServe(":5005", nil)
+	win.Play()
+	return nil
 }
 
 func (c *ikascrewClient) infoHandler(w http.ResponseWriter, r *http.Request) {

@@ -56,7 +56,7 @@ func NewPhrase(texts []string) (*Phrase, error) {
 	copy(p.text, texts)
 
 	//p.dst = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
-	bg = opencv.LoadImage("projects/20170213/utopia.jpg")
+	bg = opencv.LoadImage("projects/20170316/siesta.jpg")
 
 	return &p, nil
 }

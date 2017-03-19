@@ -12,7 +12,7 @@ type Image struct {
 }
 
 func NewImage() (*Image, error) {
-	bg = opencv.LoadImage("projects/20170213/utopia.jpg")
+	bg = opencv.LoadImage("projects/20170316/siesta.jpg")
 	img := Image{
 		bg: bg,
 	}

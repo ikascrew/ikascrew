@@ -5,14 +5,16 @@ import (
 	"io/ioutil"
 	"sort"
 	"strings"
+
+	"github.com/secondarykey/ikascrew/video"
 )
 
 var project string
-var videos map[string]Video
+var videos map[string]video.Video
 
 func init() {
 	project = ""
-	videos = make(map[string]Video)
+	videos = make(map[string]video.Video)
 }
 
 func PrintVideos() {
@@ -23,7 +25,7 @@ func PrintVideos() {
 	fmt.Printf("#######################################\n")
 }
 
-func GetSource(name string) (Video, error) {
+func GetSource(name string) (video.Video, error) {
 
 	if strings.LastIndex(name, ".mp4") == -1 {
 		name = name + ".mp4"
@@ -37,7 +39,7 @@ func GetSource(name string) (Video, error) {
 	return v, nil
 }
 
-func GetVideo(name string) (Video, error) {
+func GetVideo(name string) (video.Video, error) {
 	v, err := GetSource(project + "/" + name)
 	if err != nil {
 		v, err = GetSource(name)
@@ -45,7 +47,7 @@ func GetVideo(name string) (Video, error) {
 	return v, err
 }
 
-func SetVideo(name string, v Video) {
+func SetVideo(name string, v video.Video) {
 	videos[name] = v
 }
 
@@ -84,7 +86,7 @@ func Loading(name string) error {
 		} else {
 			idx := strings.LastIndex(fname, ".mp4")
 			if idx == len(fname)-4 {
-				v, err := NewFile(name + "/" + fname)
+				v, err := video.NewFile(name + "/" + fname)
 				if err != nil {
 					return fmt.Errorf("Error New Video:%s", err)
 				}
@@ -96,8 +98,8 @@ func Loading(name string) error {
 }
 
 func loadPlugin() {
-	p, _ := NewTwitter()
+	p, _ := video.NewTwitter()
 	videos[p.Source()] = p
-	img, _ := NewImage()
+	img, _ := video.NewImage()
 	videos[img.Source()] = img
 }

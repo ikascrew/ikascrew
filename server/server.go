@@ -2,18 +2,19 @@ package server
 
 import (
 	"fmt"
-	"ikascrew"
 	"net/http"
 	"runtime"
-	"time"
 
 	"github.com/google/gops/agent"
+	"github.com/secondarykey/ikascrew"
+	"github.com/secondarykey/ikascrew/video"
 )
 
 type Sync struct {
-	V1    string `json:"v1"`
-	V2    string `json:"v2"`
-	Frame int    `json:"frame"`
+	V1      string `json:"v1"`
+	V2      string `json:"v2"`
+	Project string `json:"project"`
+	Frame   int    `json:"frame"`
 }
 
 type Message struct {
@@ -28,10 +29,13 @@ type Information struct {
 }
 
 type IkascrewServer struct {
-	q *ikascrew.Queue
+	q      *ikascrew.Queue
+	window *ikascrew.Window
 }
 
 const ADDRESS = "localhost:5555"
+
+var project string
 
 func init() {
 }
@@ -48,7 +52,7 @@ func Start(d string) error {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	project := d
+	project = d
 	err := ikascrew.Loading(project)
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
@@ -61,23 +65,24 @@ func Start(d string) error {
 		return fmt.Errorf("Error New Queue:%s", err)
 	}
 
+	win := ikascrew.NewWindow("ikascrew", q)
+
 	ika := &IkascrewServer{
-		q: q,
+		q:      q,
+		window: win,
 	}
 
-	win := ikascrew.NewWindow("ikascrew")
-	time.Sleep(300 * time.Millisecond)
-
 	go func() {
-		win.Play(q)
+		http.HandleFunc("/sync", ika.syncHandler)
+		http.HandleFunc("/push", ika.pushHandler)
+		http.HandleFunc("/switch", ika.switchHandler)
+		http.HandleFunc("/effect", ika.effectHandler)
+		http.HandleFunc("/info", ika.informationHandler)
+		http.ListenAndServe(ADDRESS, nil)
 	}()
 
-	http.HandleFunc("/sync", ika.syncHandler)
-	http.HandleFunc("/push", ika.pushHandler)
-	http.HandleFunc("/switch", ika.switchHandler)
-	http.HandleFunc("/effect", ika.effectHandler)
-	http.HandleFunc("/info", ika.informationHandler)
-	return http.ListenAndServe(ADDRESS, nil)
+	win.Play()
+	return nil
 }
 
 func (i *IkascrewServer) syncHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,10 +91,13 @@ func (i *IkascrewServer) syncHandler(w http.ResponseWriter, r *http.Request) {
 
 	v1, v2 := i.q.Name()
 
+	i.window.FullScreen()
+
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, "{")
 	fmt.Fprintf(w, "\"v1\" : \"%s\",", v1)
 	fmt.Fprintf(w, "\"v2\" : \"%s\",", v2)
+	fmt.Fprintf(w, "\"project\" : \"%s\",", project)
 	fmt.Fprintf(w, "\"frame\" : %d", i.q.Current())
 	fmt.Fprintf(w, "}")
 }
@@ -126,7 +134,7 @@ func (i *IkascrewServer) pushHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("[%s]\n", next)
 
 	if next == "_ikascrew_Twitter.mp4" {
-		v, err := ikascrew.NewTwitter()
+		v, err := video.NewTwitter()
 		if err == nil {
 			ikascrew.SetVideo(next, v)
 		} else {

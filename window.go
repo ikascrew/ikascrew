@@ -12,22 +12,23 @@ type Window struct {
 	window *opencv.Window
 }
 
-func NewWindow(name string) *Window {
+func NewWindow(name string, q *Queue) *Window {
 	rtn := &Window{}
 	win := opencv.NewWindow(name)
 	rtn.window = win
+
+	rtn.q = q
+
 	return rtn
 }
 
-func (w *Window) Play(q *Queue) {
+func (w *Window) Play() {
 
-	w.q = q
 	for {
-
-		img := q.Next()
+		img := w.q.Next()
 		if img != nil {
 			w.window.ShowImage(img)
-			opencv.WaitKey(q.Wait())
+			opencv.WaitKey(w.q.Wait())
 		}
 	}
 }
@@ -37,4 +38,8 @@ func (w *Window) Destroy() {
 		w.q.Release()
 	}
 	w.window.Destroy()
+}
+
+func (w *Window) FullScreen() {
+	w.window.SetProperty(opencv.CV_WND_PROP_FULLSCREEN, opencv.CV_WINDOW_FULLSCREEN)
 }

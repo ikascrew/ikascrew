@@ -2,14 +2,16 @@ package ikascrew
 
 import (
 	"fmt"
+
 	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/secondarykey/ikascrew/video"
 )
 
 type Queue struct {
-	V1           Video
-	V2           Video
-	current      Video
-	effect       Video
+	V1           video.Video
+	V2           video.Video
+	current      video.Video
+	effect       video.Video
 	img          *opencv.IplImage
 	stop         bool
 	switchCount  int
@@ -54,7 +56,7 @@ func NewSourceQueue(src string, f int) (*Queue, error) {
 	return rtn, nil
 }
 
-func (q *Queue) EffectSwitch(v Video) error {
+func (q *Queue) EffectSwitch(v video.Video) error {
 
 	if q.V2 == nil {
 		return fmt.Errorf("Switch need V2 video")
@@ -127,12 +129,12 @@ func (q *Queue) Next() *opencv.IplImage {
 
 }
 
-func (q *Queue) Effect(v Video) {
+func (q *Queue) Effect(v video.Video) {
 	q.effect = v
 	return
 }
 
-func (q *Queue) Sub(v Video) {
+func (q *Queue) Sub(v video.Video) {
 	q.V2 = v
 	return
 }
@@ -151,7 +153,7 @@ func (q *Queue) Name() (string, string) {
 	return v1Name, v2Name
 }
 
-func (q *Queue) Set(v Video, f int) {
+func (q *Queue) Set(v video.Video, f int) {
 
 	v.Set(f)
 	q.V1, q.V2, q.current = v, q.current, v
