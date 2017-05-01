@@ -9,77 +9,72 @@ func init() {
 }
 
 type File struct {
-	FPS      int
-	Frames   int
-	Position int
-	cap      *opencv.Capture
-	Name     string
+	fps    int
+	frames int
+	pos    int
+	name   string
+
+	cap *opencv.Capture
 }
 
-func NewFile(f string) (*File, error) {
+func NewFile(file string) (*File, error) {
 
-	cap := opencv.NewFileCapture(f)
-	if cap == nil {
+	f := File{
+		name: file,
+	}
+
+	f.cap = opencv.NewFileCapture(file)
+	if f.cap == nil {
 		return nil, fmt.Errorf("New Capture Error:[%s]", f)
 	}
+	f.fps = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FPS))
+	f.frames = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
 
-	fps := int(cap.GetProperty(opencv.CV_CAP_PROP_FPS))
-	frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
-	v := &File{
-		FPS:    fps,
-		Frames: frames,
-		cap:    cap,
-		Name:   f,
-	}
-
-	return v, nil
+	return &f, nil
 }
 
-func (v *File) Next() *opencv.IplImage {
+func (v *File) Next() (*opencv.IplImage, error) {
 
 	if v.cap == nil {
-		return nil
+		return nil, fmt.Errorf("Error:Caputure is nil")
 	}
 
 	img := v.cap.QueryFrame()
-	v.Position = int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
-
-	if v.Position >= v.Frames {
-		v.Reload()
+	if img == nil {
+		return nil, fmt.Errorf("Error:Image is nil")
 	}
-	return img
+
+	v.pos = int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
+	if v.pos == v.Size() {
+		v.Set(0)
+	}
+	return img, nil
 }
 
 func (v *File) Wait() int {
-	return 1000 / v.FPS
-}
-
-func (v *File) Size() int {
-	return v.Frames
-}
-
-func (v *File) Current() int {
-	return v.Position
+	return 1000 / v.fps
 }
 
 func (v *File) Set(f int) {
-
-	if f > v.Frames {
-		f = f % v.Frames
+	if f > v.frames {
+		f = f % v.frames
 	}
-
 	v.cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(f))
 }
 
-func (v *File) Reload() {
-	v.Set(0)
+func (v *File) Current() int {
+	return v.pos
 }
 
-func (v *File) Release() {
-	cp := v.cap
-	cp.Release()
+func (v *File) Size() int {
+	return v.frames
 }
 
 func (v *File) Source() string {
-	return v.Name
+	return v.name
+}
+
+func (v *File) Release() error {
+	v.cap.Release()
+	return nil
 }

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pb;
+service Ikascrew {
+  rpc Sync (SyncRequest) returns (SyncReply) {}
+  rpc Effect (EffectRequest) returns (EffectReply) {}
+}
+
+message SyncRequest {
+}
+
+message SyncReply {
+  string source = 1;
+  string type = 2;
+  string project = 3;
+}
+
+message EffectRequest {
+  string name = 1;
+  string type = 2;
+  string effect = 3;
+}
+
+message EffectReply {
+  bool success = 1;
+}

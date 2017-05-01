@@ -15,8 +15,12 @@ import (
 
 type Movie struct {
 	Name  string
+	Type  string
 	Image string
 }
+
+// 名称からEffectを生成する仕組
+// Effectを元に戻す undo()
 
 func CreateProject(dir string) error {
 
@@ -47,22 +51,52 @@ func CreateProject(dir string) error {
 
 		work := strings.Replace(f, dir, "", 1)
 
-		jpg := strings.Replace(work, ".mp4", ".jpg", 1)
+		ft := "file"
 
-		movie.Name = string(work[1:])
-		movie.Image = "thumb" + jpg
+		if strings.LastIndex(work, ".jpg") == len(work)-4 ||
+			strings.LastIndex(work, ".png") == len(work)-4 {
 
-		out := thumb + jpg
+			ft = "image"
+			movie.Image = "thumb" + work
 
-		mkIdx := strings.LastIndex(out, "/")
-		tmp := string(out[:mkIdx])
+			out := thumb + work
+			mkIdx := strings.LastIndex(out, "/")
+			tmp := string(out[:mkIdx])
 
-		err = os.MkdirAll(tmp, 0777)
+			err = os.MkdirAll(tmp, 0777)
 
-		err = createThumbnail(f, out, 5)
-		if err != nil {
-			return fmt.Errorf("Error Create Thumbnail:%s", err)
+			// read the whole file at once
+			b, err := ioutil.ReadFile(f)
+			if err != nil {
+				return fmt.Errorf("Error Read Image File[%s]:%s", f, err)
+			}
+
+			// write the whole body at once
+			err = ioutil.WriteFile(out, b, 0644)
+			if err != nil {
+				return fmt.Errorf("Error Write Image File[%s]:%s", out, err)
+			}
+
+		} else {
+
+			jpg := strings.Replace(work, ".mp4", ".jpg", 1)
+
+			movie.Image = "thumb" + jpg
+
+			out := thumb + jpg
+
+			mkIdx := strings.LastIndex(out, "/")
+			tmp := string(out[:mkIdx])
+
+			err = os.MkdirAll(tmp, 0777)
+
+			err = createThumbnail(f, out, 5)
+			if err != nil {
+				return fmt.Errorf("Error Create Thumbnail:%s", err)
+			}
 		}
+		movie.Name = string(work[1:])
+		movie.Type = string(ft)
 
 		movies[idx] = movie
 		bar.Increment()
@@ -70,7 +104,8 @@ func CreateProject(dir string) error {
 	bar.FinishPrint("Thumbnail Completion")
 
 	tw := Movie{
-		Name: "_ikascrew_Twitter.mp4",
+		Name: "ikascrew_microphone",
+		Type: "mic",
 	}
 	movies = append(movies, tw)
 
@@ -115,12 +150,17 @@ func CreateProject(dir string) error {
 }
 
 func search(d string) ([]string, error) {
+
 	fileInfos, err := ioutil.ReadDir(d)
 	if err != nil {
 		return nil, fmt.Errorf("Error:Read Dir[%s]", d)
 	}
 
 	rtn := make([]string, 0)
+	if strings.Index(d, ".public") != -1 {
+		return rtn, nil
+	}
+
 	for _, f := range fileInfos {
 		fname := f.Name()
 		if f.IsDir() {
@@ -130,8 +170,12 @@ func search(d string) ([]string, error) {
 			}
 			rtn = append(rtn, files...)
 		} else {
-			idx := strings.LastIndex(fname, ".mp4")
-			if idx == len(fname)-4 {
+			midx := strings.LastIndex(fname, ".mp4")
+			jidx := strings.LastIndex(fname, ".jpg")
+			pidx := strings.LastIndex(fname, ".png")
+			if midx == len(fname)-4 ||
+				jidx == len(fname)-4 ||
+				pidx == len(fname)-4 {
 				rtn = append(rtn, d+"/"+fname)
 			}
 		}

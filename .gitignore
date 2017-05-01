@@ -5,4 +5,5 @@
 pkg/*
 bin/*
 cmd/projects/*
-cmd/app.json
+cmd/sample/*
+cmd/*.json

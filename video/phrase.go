@@ -29,10 +29,11 @@ func init() {
 }
 
 type Phrase struct {
-	text []string
-	num  int
-	now  []line
-	dst  *opencv.IplImage
+	current int
+	text    []string
+	now     []line
+	dst     *opencv.IplImage
+	bg      *opencv.IplImage
 }
 
 type line struct {
@@ -43,30 +44,29 @@ type line struct {
 	font *opencv.Font
 }
 
-var bg *opencv.IplImage
-
 func NewPhrase(texts []string) (*Phrase, error) {
 
+	//TODO 設定値、フォント、さいず
+	//TODO 背景を指定(マージだけでいいか？)
+
 	p := Phrase{
-		num: 5,
-		now: make([]line, 5),
+		current: 0,
+		now:     make([]line, 5),
 	}
 
 	p.text = make([]string, len(texts))
 	copy(p.text, texts)
 
-	//p.dst = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
-	bg = opencv.LoadImage("projects/20170316/siesta.jpg")
+	p.dst = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
+	//TODO 背景の画像？
+	p.bg = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
 
 	return &p, nil
 }
 
 func (p *Phrase) initialize() {
 
-	var wk *opencv.IplImage
-	wk = p.dst
-	defer wk.Release()
-	p.dst = bg.Clone()
+	opencv.Copy(p.bg, p.dst, nil)
 
 	for idx, _ := range p.now {
 
@@ -90,39 +90,43 @@ func (p *Phrase) initialize() {
 	return
 }
 
-func (p *Phrase) Next() *opencv.IplImage {
+func (p *Phrase) Next() (*opencv.IplImage, error) {
 
 	p.initialize()
 	for _, elm := range p.now {
 		pos := opencv.Point{elm.x, elm.y}
 		elm.font.AddText(p.dst, elm.text, pos)
 	}
-	return p.dst
+
+	p.current++
+	if p.current == p.Size() {
+		p.current = 0
+	}
+	return p.dst, nil
 }
 
 func (v *Phrase) Wait() int {
 	return 33
 }
 
+func (v *Phrase) Set(f int) {
+	v.current = f
+}
+
+func (v *Phrase) Current() int {
+	return v.current
+}
+
 func (v *Phrase) Size() int {
 	return 100
 }
 
-func (v *Phrase) Current() int {
-	return 30
-}
-
-func (v *Phrase) Set(f int) {
-}
-
-func (v *Phrase) Reload() {
-	v.Set(0)
-}
-
-func (v *Phrase) Release() {
-	v.dst.Release()
-}
-
 func (v *Phrase) Source() string {
 	return "ikascrew_Phrase"
+}
+
+func (v *Phrase) Release() error {
+	v.bg.Release()
+	v.dst.Release()
+	return nil
 }

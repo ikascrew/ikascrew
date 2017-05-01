@@ -1,6 +1,7 @@
 package ikascrew
 
 import (
+	"fmt"
 	"github.com/secondarykey/go-opencv/opencv"
 )
 
@@ -8,38 +9,55 @@ func init() {
 }
 
 type Window struct {
-	q      *Queue
+	effect Effect
 	window *opencv.Window
 }
 
-func NewWindow(name string, q *Queue) *Window {
+func NewWindow(name string, e Effect) *Window {
+
 	rtn := &Window{}
 	win := opencv.NewWindow(name)
 	rtn.window = win
-
-	rtn.q = q
+	rtn.effect = e
 
 	return rtn
 }
 
-func (w *Window) Play() {
-
+func (w *Window) Play() error {
 	for {
-		img := w.q.Next()
+
+		img, err := w.effect.Next()
+		if err != nil {
+			return err
+		}
+
 		if img != nil {
 			w.window.ShowImage(img)
-			opencv.WaitKey(w.q.Wait())
+			opencv.WaitKey(w.effect.Wait())
 		}
 	}
+	return fmt.Errorf("Error : Stream is nil")
 }
 
 func (w *Window) Destroy() {
-	if w.q != nil {
-		w.q.Release()
+	if w.effect != nil {
+		w.effect.Release()
 	}
 	w.window.Destroy()
 }
 
+func (w *Window) Current() string {
+	return w.effect.String()
+}
+
 func (w *Window) FullScreen() {
-	w.window.SetProperty(opencv.CV_WND_PROP_FULLSCREEN, opencv.CV_WINDOW_FULLSCREEN)
+	w.window.SetProperty(opencv.CV_WND_PROP_FULLSCREEN, float64(opencv.CV_WINDOW_FULLSCREEN))
+}
+
+func (w *Window) GetEffect() Effect {
+	return w.effect
+}
+
+func (w *Window) SetEffect(e Effect) {
+	w.effect = e
 }

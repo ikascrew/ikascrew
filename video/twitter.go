@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/secondarykey/go-opencv/opencv"
-
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 )
@@ -31,11 +29,10 @@ var app *twitterConfig
 
 func loadConfig() error {
 
-	raw, err := ioutil.ReadFile("app.json")
+	raw, err := ioutil.ReadFile("twitter.json")
 	if err != nil {
 		return err
 	}
-
 	app = &twitterConfig{}
 
 	err = json.Unmarshal(raw, app)
@@ -108,14 +105,9 @@ func NewTwitter() (*Twitter, error) {
 }
 
 func (t *Twitter) initialize() {
+
 	t.Phrase.initialize()
 	return
-}
-
-var counter int
-
-func (t *Twitter) Next() *opencv.IplImage {
-	return t.Phrase.Next()
 }
 
 func (v *Twitter) Source() string {

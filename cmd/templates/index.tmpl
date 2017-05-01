@@ -47,41 +47,27 @@
 
   <div class="mdl-card__supporting-text">
 
-      <button id="{{.Name}}-remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="" data-cmd="switch">
+
+      <button id="{{.Name}}-remote-mate" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="mate">
           <i class="material-icons right-section"> autorenew</i>
       </button>
 
-      <button id="{{.Name}}-remote-effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-type="remote" data-name="{{.Name}}" data-cmd="effect">
-          <i class="material-icons right-section"> tab_unselected</i>
+      <button id="{{.Name}}-remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="switch">
+          <i class="material-icons right-section"> restore</i>
       </button>
 
   </div>
 
   <div class="mdl-card__menu">
 
-      <button id="{{.Name}}-load" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="load" data-name="{{.Name}}">
-      <i class="material-icons">backup</i>
-    </button>
-
-    <button id="{{.Name}}-push" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="push" data-name="{{.Name}}">
-      <i class="material-icons">settings_backup_restore</i>
-    </button>
-
-    <button id="{{.Name}}-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="switch" data-name="{{.Name}}">
-      <i class="material-icons">autorenew</i>
-    </button>
-
-    <button id="{{.Name}}-effect" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect name_call" data-type="effect" data-name="{{.Name}}">
-      <i class="material-icons">tab_unselected</i>
+    <button id="{{.Name}}-load" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect client_call" data-type="{{.Type}}" data-name="{{.Name}}">
+      <i class="material-icons">input</i>
     </button>
 
     <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-remote-switch">Switch</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-remote-effect">Effect</div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-remote-mate">Mate</div>
 
     <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-load">Load</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-push">Push</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-switch">Switch</div>
-    <div class="mdl-tooltip mdl-tooltip--large" for="{{.Name}}-effect">Effect</div>
 
   </div>
 </div>
@@ -96,29 +82,27 @@
     <script type="text/javascript" src="jquery-3.1.1.min.js"></script>
 
     <script>
-$(".name_call").click(function() {
-    var cmd = $(this).attr("data-type");
-    var name = $(this).attr("data-name");
-    var data = {};
-    data.name = name;
-
-    ajaxCommand(cmd,data);
-});
-
 $(".client_call").click(function() {
-    var cmd = $(this).attr("data-type");
-    ajaxCommand(cmd);
+    var name = $(this).attr("data-name");
+    var type = $(this).attr("data-type");
+    var data = {};
+    data.name   = name;
+    data.type   = type;
+
+    ajaxCommand("load",data);
 });
 
 $(".remote_call").click(function() {
-    var cmd = $(this).attr("data-type");
-    var rm = $(this).attr("data-cmd");
-    var name = $(this).attr("data-name");
-    var data = {};
-    data.name = name;
-    data.cmd = rm;
+    var name   = $(this).attr("data-name");
+    var type   = $(this).attr("data-type");
+    var effect = $(this).attr("data-effect");
 
-    ajaxCommand(cmd,data);
+    var data = {};
+    data.name   = name;
+    data.type   = type;
+    data.effect = effect;
+
+    ajaxCommand("switch",data);
 });
 
 function ajaxCommand(command,data) {

@@ -1,6 +1,8 @@
 package video
 
 import (
+	"fmt"
+
 	"github.com/secondarykey/go-opencv/opencv"
 )
 
@@ -8,43 +10,53 @@ func init() {
 }
 
 type Image struct {
-	bg *opencv.IplImage
+	current int
+	name    string
+	bg      *opencv.IplImage
 }
 
-func NewImage() (*Image, error) {
-	bg = opencv.LoadImage("projects/20170316/siesta.jpg")
+func NewImage(f string) (*Image, error) {
 	img := Image{
-		bg: bg,
+		name:    f,
+		current: 0,
 	}
+	img.bg = opencv.LoadImage(f)
+	if img.bg == nil {
+		return nil, fmt.Errorf("Error:LoadImage[%s]", f)
+	}
+
 	return &img, nil
 }
 
-func (p *Image) Next() *opencv.IplImage {
-	return p.bg
+func (v *Image) Next() (*opencv.IplImage, error) {
+	v.current++
+	if v.current == v.Size() {
+		v.current = 0
+	}
+	return v.bg, nil
 }
 
 func (v *Image) Wait() int {
 	return 33
 }
 
+func (v *Image) Set(f int) {
+	v.current = f
+}
+
+func (v *Image) Current() int {
+	return v.current
+}
+
 func (v *Image) Size() int {
 	return 100
 }
 
-func (v *Image) Current() int {
-	return 30
-}
-
-func (v *Image) Set(f int) {
-}
-
-func (v *Image) Reload() {
-}
-
-func (v *Image) Release() {
-	v.bg.Release()
-}
-
 func (v *Image) Source() string {
-	return "_ikascrew_Image.mp4"
+	return v.name
+}
+
+func (v *Image) Release() error {
+	v.bg.Release()
+	return nil
 }
