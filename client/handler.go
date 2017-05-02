@@ -9,13 +9,19 @@ import (
 	"github.com/secondarykey/ikascrew/video"
 )
 
+const (
+	WEBDIR = "/.public"
+)
+
 func init() {
 }
 
 func (ika *IkascrewClient) startHTTP() {
+
 	http.HandleFunc("/load", ika.loadHandler)
 	http.HandleFunc("/switch", ika.switchHandler)
 	http.Handle("/", http.FileServer(http.Dir(ikascrew.ProjectName()+"/.public/")))
+
 	go func() {
 		http.ListenAndServe(":5555", nil)
 	}()
@@ -29,26 +35,17 @@ func (ika *IkascrewClient) loadHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	t := r.FormValue("type")
 
-	var v ikascrew.Video
-	var err error
-
-	file := ikascrew.ProjectName() + "/" + name
-
-	switch t {
-	case "file":
-		v, err = video.NewFile(file)
-	case "image":
-		v, err = video.NewImage(file)
-	case "mic":
-		v, err = video.NewMicrophone()
-	default:
-		err = fmt.Errorf("Not Support Type[%s]", t)
-	}
+	v, err := video.Get(video.Type(t), name)
 	if err != nil {
-		fmt.Println("Error createVideo:", err)
+		fmt.Println(err)
+		return
 	}
 
 	e, err := effect.NewNormal(v)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	ika.window.SetEffect(e)
 }

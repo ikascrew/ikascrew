@@ -126,6 +126,12 @@ func CreateProject(dir string) error {
 	}
 	bar.Increment()
 
+	err = copyFile("templates/sub.tmpl", public+"/sub.html")
+	if err != nil {
+		return fmt.Errorf("Error Copy:%s", err)
+	}
+	bar.Increment()
+
 	err = copyFile("templates/styles.css", public+"/styles.css")
 	if err != nil {
 		return fmt.Errorf("Error Copy:%s", err)

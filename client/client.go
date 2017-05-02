@@ -18,17 +18,20 @@ func Start() error {
 
 	ika := &IkascrewClient{}
 
-	err := ika.syncServer()
+	rep, err := ika.syncServer()
 	if err != nil {
 		return err
 	}
 
-	err = ikascrew.Loading("projects/20170502")
+	err = ikascrew.Loading(rep.Project)
 	if err != nil {
 		return err
 	}
 
-	f, err := video.NewImage("projects/20170502/logo.png")
+	f, err := video.Get(video.Type(rep.Type), rep.Source)
+	if err != nil {
+		return err
+	}
 
 	n, err := effect.NewNormal(f)
 	if err != nil {

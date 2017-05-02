@@ -18,12 +18,11 @@ type Mate struct {
 	device    *os.File
 }
 
-func NewMate(v ikascrew.Video, e ikascrew.Effect) (*Mate, error) {
+const (
+	MATE_FILE = "/dev/input/powermate"
+)
 
-	// eがmateだったら
-	// e.endを倒して
-	// e.s.nowのフレームを取得
-	// normal Effectに変更する
+func NewMate(v ikascrew.Video, e ikascrew.Effect) (*Mate, error) {
 
 	s, err := NewSwitch(v, e)
 	if err != nil {
@@ -32,8 +31,7 @@ func NewMate(v ikascrew.Video, e ikascrew.Effect) (*Mate, error) {
 
 	s.number = 100
 
-	fname := "/dev/input/powermate"
-	device, err := os.OpenFile(fname, os.O_RDONLY, 0666)
+	device, err := os.OpenFile(MATE_FILE, os.O_RDONLY, 0666)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +72,6 @@ func (b *Mate) String() string {
 }
 
 //github.com/awly/pmd
-
 func (m *Mate) loop() {
 	buf := make([]byte, 48)
 	for {

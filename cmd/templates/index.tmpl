@@ -23,38 +23,24 @@
         </div>
       </div>
 
-      <div class="ikascrew-drawer mdl-layout__drawer">
-        <nav class="mdl-navigation">
-
-          <div class="ikascrew-drawer-separator">Controller</div>
-
-          <a class="mdl-navigation__link client_call" href="#" data-type="info">Information</a>
-          <a class="mdl-navigation__link client_call" href="#" data-type="sync">Sync</a>
-
-          <div class="ikascrew-drawer-separator">Directory</div>
-          <a class="mdl-navigation__link" href="">Server</a>
-        </nav>
-      </div>
-
-      <div class="ikascrew-content mdl-layout__content">
+      <div class="ikascrew-content mdl-layout__content" id="parent_container">
 
 {{range .}}
 <div class="ikascrew-card-wide mdl-card mdl-shadow--2dp">
 
-    <div class="mdl-card__title" style="background: url('{{.Image}}') center / cover;"> 
-        <h2 class="mdl-card__title-text">{{.Name}}</h2>
+  <div class="mdl-card__title" style="background: url('{{.Image}}') center / cover;"> 
+    <h2 class="mdl-card__title-text">{{.Name}}</h2>
   </div>
 
-  <div class="mdl-card__supporting-text">
+  <div class="mdl-card__supporting-text" style="display:none;">
 
-
-      <button id="{{.Name}}-remote-mate" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="mate">
+    <button id="{{.Name}}-remote-mate" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="mate">
           <i class="material-icons right-section"> autorenew</i>
-      </button>
+    </button>
 
-      <button id="{{.Name}}-remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="switch">
+    <button id="{{.Name}}-remote-switch" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect remote_call" data-name="{{.Name}}" data-type="{{.Type}}" data-effect="switch">
           <i class="material-icons right-section"> restore</i>
-      </button>
+    </button>
 
   </div>
 
@@ -71,6 +57,7 @@
 
   </div>
 </div>
+
 <br/>
 {{end}}
 
@@ -82,12 +69,32 @@
     <script type="text/javascript" src="jquery-3.1.1.min.js"></script>
 
     <script>
+var win;
+
 $(".client_call").click(function() {
     var name = $(this).attr("data-name");
-    var type = $(this).attr("data-type");
+   var type = $(this).attr("data-type");
     var data = {};
     data.name   = name;
     data.type   = type;
+
+    if ( !win || win.closed ) {
+
+        var p = $(this).parent().prev().css("display","block");
+        win = window.open("sub.html","ikasub","toolber=no,location=no,directories=no,status=no")
+        win.onload = function() {
+            //別ウィンドウに追加
+            var con = win.$("#child_container");
+            con.append("<br>");
+            con.append(p.parent());
+        };
+
+    } else {
+        var con = win.$("#child_container");
+        con.append("<br>");
+        var p = $(this).parent().prev().css("display","block");
+        con.append(p.parent());
+    }
 
     ajaxCommand("load",data);
 });
@@ -101,6 +108,12 @@ $(".remote_call").click(function() {
     data.name   = name;
     data.type   = type;
     data.effect = effect;
+
+    var con = $("#parent_container");
+    var p = $(this).parent().css("display","none");
+
+    con.append("<br>");
+    con.append(p.parent());
 
     ajaxCommand("switch",data);
 });

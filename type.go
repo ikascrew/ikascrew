@@ -5,8 +5,6 @@ import (
 )
 
 type Video interface {
-	//Load(string) error
-
 	Next() (*opencv.IplImage, error)
 	Wait() int
 	Set(int)
@@ -19,8 +17,6 @@ type Video interface {
 }
 
 type Effect interface {
-
-	//	Change(Effect) error
 	Next() (*opencv.IplImage, error)
 
 	Wait() int

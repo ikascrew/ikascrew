@@ -9,26 +9,27 @@ import (
 	"github.com/secondarykey/ikascrew/pb"
 )
 
-func (i *IkascrewClient) syncServer() error {
+func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 
 	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 	c := pb.NewIkascrewClient(conn)
 
 	r, err := c.Sync(context.Background(), &pb.SyncRequest{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Printf("Success[%s]\n", r)
+	fmt.Println(r)
 
-	return nil
+	return r, nil
 }
 
 func (i *IkascrewClient) callSwitch(f string, t string, e string) error {
+
 	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -46,6 +47,6 @@ func (i *IkascrewClient) callSwitch(f string, t string, e string) error {
 		return err
 	}
 
-	fmt.Printf("Success[%s]\n", r)
+	fmt.Println(r)
 	return nil
 }

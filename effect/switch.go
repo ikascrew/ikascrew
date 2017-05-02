@@ -24,7 +24,7 @@ func NewSwitch(v ikascrew.Video, e ikascrew.Effect) (*Switch, error) {
 		video:  v,
 		now:    e,
 		count:  1,
-		number: 300,
+		number: 200,
 		img:    dst,
 	}
 	return &s, nil

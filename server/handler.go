@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"golang.org/x/net/context"
@@ -32,7 +31,8 @@ func (i *IkascrewServer) startRPC() error {
 	reflection.Register(s)
 	go func() {
 		if err := s.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
+			fmt.Println("failed to serve: %v", err)
+			panic(err)
 		}
 	}()
 	return nil
@@ -55,42 +55,13 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 	rep := &pb.EffectReply{
 		Success: false,
 	}
-	name := ikascrew.ProjectName() + "/" + r.Name
 
-	var v ikascrew.Video
-	var err error
-
-	switch r.Type {
-	case "file":
-		v, err = video.NewFile(name)
-	case "image":
-		v, err = video.NewImage(name)
-	case "mic":
-		v, err = video.NewMicrophone()
-	default:
-		err = fmt.Errorf("Not Support Type[%s]", r.Type)
-	}
-
+	v, err := video.Get(video.Type(r.Type), r.Name)
 	if err != nil {
 		return rep, err
 	}
 
-	var e ikascrew.Effect
-	switch r.Effect {
-	case "switch":
-		e, err = effect.NewSwitch(v, i.window.GetEffect())
-	case "mate":
-		now := i.window.GetEffect()
-		switch now.(type) {
-		case *effect.Mate:
-			err = fmt.Errorf("MateEffect Can not be used continuously.")
-		default:
-			e, err = effect.NewMate(v, now)
-		}
-	default:
-		err = fmt.Errorf("Not Support Effect[%s]", r.Effect)
-	}
-
+	e, err := effect.Get(effect.Type(r.Effect), v, i.window.GetEffect())
 	if err != nil {
 		return rep, err
 	}
