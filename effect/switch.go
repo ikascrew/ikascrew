@@ -33,11 +33,6 @@ func NewSwitch(v ikascrew.Video, e ikascrew.Effect) (*Switch, error) {
 func (s *Switch) Next() (*opencv.IplImage, error) {
 
 	if s.count == s.number {
-
-		if s.img != nil {
-			defer s.finish()
-		}
-
 		return s.video.Next()
 	} else {
 
@@ -70,6 +65,10 @@ func (s *Switch) Wait() int {
 }
 
 func (s *Switch) Release() error {
+
+	s.img.Release()
+	s.now.Release()
+
 	return s.video.Release()
 }
 
