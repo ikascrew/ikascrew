@@ -57,6 +57,9 @@ func (v *Image) Source() string {
 }
 
 func (v *Image) Release() error {
-	v.bg.Release()
+	if v.bg != nil {
+		v.bg.Release()
+	}
+	v.bg = nil
 	return nil
 }

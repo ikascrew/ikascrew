@@ -58,7 +58,6 @@
   </div>
 </div>
 
-<br/>
 {{end}}
 
       </div>
@@ -85,13 +84,11 @@ $(".client_call").click(function() {
         win.onload = function() {
             //別ウィンドウに追加
             var con = win.$("#child_container");
-            con.append("<br>");
             con.append(p.parent());
         };
 
     } else {
         var con = win.$("#child_container");
-        con.append("<br>");
         var p = $(this).parent().prev().css("display","block");
         con.append(p.parent());
     }
@@ -112,7 +109,6 @@ $(".remote_call").click(function() {
     var con = $("#parent_container");
     var p = $(this).parent().css("display","none");
 
-    con.append("<br>");
     con.append(p.parent());
 
     ajaxCommand("switch",data);

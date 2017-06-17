@@ -38,9 +38,13 @@ func (i *IkascrewServer) startRPC() error {
 	return nil
 }
 
-func (i *IkascrewServer) Sync(ctx context.Context, r *pb.SyncRequest) (*pb.SyncReply, error) {
-	i.window.FullScreen()
+//func (i *IkascrewServer) FullScreen(ctx context.Context, r *pb.FullScreenRequest) (*pb.FullScreenReply, error) {
+//i.window.FullScreen()
+//}
 
+func (i *IkascrewServer) Sync(ctx context.Context, r *pb.SyncRequest) (*pb.SyncReply, error) {
+
+	i.window.FullScreen()
 	rep := &pb.SyncReply{
 		Source:  "logo.png",
 		Type:    "image",
@@ -55,6 +59,8 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 	rep := &pb.EffectReply{
 		Success: false,
 	}
+
+	fmt.Printf("[%s]-[%s]\n", r.Type, r.Name)
 
 	v, err := video.Get(video.Type(r.Type), r.Name)
 	if err != nil {

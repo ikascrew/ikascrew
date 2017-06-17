@@ -7,6 +7,7 @@ import (
 	"github.com/google/gops/agent"
 
 	"github.com/secondarykey/ikascrew"
+	"github.com/secondarykey/ikascrew/config"
 	"github.com/secondarykey/ikascrew/effect"
 	"github.com/secondarykey/ikascrew/video"
 )
@@ -37,13 +38,17 @@ func Start(d string) error {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}
 
-	//TODO app.json をみよう
-	f, err := video.NewImage(d + "/logo.png")
+	app, err := config.Get()
 	if err != nil {
-		return fmt.Errorf("Error:Video Load")
+		return fmt.Errorf("Error:Config[%v]", err)
 	}
 
-	e, err := effect.NewNormal(f)
+	v, err := video.Get(video.Type(app.Default.Type), app.Default.Name)
+	if err != nil {
+		return fmt.Errorf("Error:Video Load[%v]")
+	}
+
+	e, err := effect.NewNormal(v)
 	if err != nil {
 		return fmt.Errorf("Error:Effect")
 	}

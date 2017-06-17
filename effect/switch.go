@@ -1,6 +1,8 @@
 package effect
 
 import (
+	"fmt"
+
 	"github.com/secondarykey/go-opencv/opencv"
 	"github.com/secondarykey/ikascrew"
 )
@@ -27,10 +29,18 @@ func NewSwitch(v ikascrew.Video, e ikascrew.Effect) (*Switch, error) {
 		number: 200,
 		img:    dst,
 	}
+
+	fmt.Printf("Switch[%p] New\n", &s)
+
 	return &s, nil
 }
 
 func (s *Switch) Next() (*opencv.IplImage, error) {
+
+	if s.video == nil || s.now == nil {
+		fmt.Println("Caution [Video == nil]")
+		return nil, nil
+	}
 
 	if s.count == s.number {
 		return s.video.Next()
@@ -44,17 +54,11 @@ func (s *Switch) Next() (*opencv.IplImage, error) {
 
 		s.count++
 
+		if s.count == s.number {
+			fmt.Println("Switch Done!")
+		}
 		return s.img, nil
 	}
-}
-
-func (s *Switch) finish() error {
-	s.img.Release()
-	s.now.Release()
-
-	s.img = nil
-	s.now = nil
-	return nil
 }
 
 func (s *Switch) Wait() int {
@@ -66,10 +70,27 @@ func (s *Switch) Wait() int {
 
 func (s *Switch) Release() error {
 
-	s.img.Release()
-	s.now.Release()
+	fmt.Printf("Switch[%p] Release\n", s)
 
-	return s.video.Release()
+	if s.img != nil {
+		s.img.Release()
+	}
+	s.img = nil
+
+	if s.now != nil {
+		s.now.Release()
+	}
+	s.now = nil
+
+	if s.video != nil {
+		err := s.video.Release()
+		if err != nil {
+			return err
+		}
+	}
+
+	s.video = nil
+	return nil
 }
 
 func (s *Switch) String() string {

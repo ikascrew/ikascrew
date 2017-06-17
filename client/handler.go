@@ -47,11 +47,7 @@ func (ika *IkascrewClient) loadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wk := ika.window.GetEffect()
 	ika.window.SetEffect(e)
-
-	wk.Release()
-
 }
 
 // switch

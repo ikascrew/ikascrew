@@ -9,8 +9,10 @@ func init() {
 }
 
 type Window struct {
-	effect Effect
-	window *opencv.Window
+	effect  Effect
+	old     Effect
+	release Effect
+	window  *opencv.Window
 }
 
 func NewWindow(name string, e Effect) *Window {
@@ -19,6 +21,8 @@ func NewWindow(name string, e Effect) *Window {
 	win := opencv.NewWindow(name)
 	rtn.window = win
 	rtn.effect = e
+	rtn.old = nil
+	rtn.release = nil
 
 	return rtn
 }
@@ -59,5 +63,13 @@ func (w *Window) GetEffect() Effect {
 }
 
 func (w *Window) SetEffect(e Effect) {
+	if w.release != nil {
+		w.release.Release()
+	}
+	if w.old != nil {
+		w.release = w.old
+	}
+	w.old = w.effect
+
 	w.effect = e
 }

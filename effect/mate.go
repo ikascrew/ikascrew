@@ -2,6 +2,7 @@ package effect
 
 import (
 	"encoding/binary"
+	"fmt"
 	"os"
 	"runtime"
 	"time"
@@ -41,8 +42,9 @@ func NewMate(v ikascrew.Video, e ikascrew.Effect) (*Mate, error) {
 		pressed: false,
 		device:  device,
 	}
-
 	go m.loop()
+
+	fmt.Printf("Mate[%p] New\n", &m)
 
 	return &m, nil
 }
@@ -63,6 +65,9 @@ func (b *Mate) Wait() int {
 }
 
 func (b *Mate) Release() error {
+
+	fmt.Printf("Mate[%p] Release\n", b)
+
 	b.end = true
 	return b.s.Release()
 }

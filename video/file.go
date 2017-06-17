@@ -2,6 +2,7 @@ package video
 
 import (
 	"fmt"
+
 	"github.com/secondarykey/go-opencv/opencv"
 )
 
@@ -19,6 +20,7 @@ type File struct {
 
 func NewFile(file string) (*File, error) {
 
+	//設定値
 	f := File{
 		name: file,
 	}
@@ -48,6 +50,7 @@ func (v *File) Next() (*opencv.IplImage, error) {
 	if v.pos == v.Size() {
 		v.Set(0)
 	}
+
 	return img, nil
 }
 
@@ -60,6 +63,7 @@ func (v *File) Set(f int) {
 		f = f % v.frames
 	}
 	v.cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(f))
+	v.pos = f
 }
 
 func (v *File) Current() int {
@@ -75,6 +79,9 @@ func (v *File) Source() string {
 }
 
 func (v *File) Release() error {
-	v.cap.Release()
+	if v.cap != nil {
+		v.cap.Release()
+	}
+	v.cap = nil
 	return nil
 }
