@@ -19,7 +19,6 @@ type Movie struct {
 	Image string
 }
 
-// 名称からEffectを生成する仕組
 // Effectを元に戻す undo()
 
 func CreateProject(dir string) error {
@@ -32,6 +31,7 @@ func CreateProject(dir string) error {
 	if err != nil {
 		return fmt.Errorf("Error make directory:%s", thumb)
 	}
+
 	err = os.MkdirAll(images, 0777)
 	if err != nil {
 		return fmt.Errorf("Error make directory:%s", images)
@@ -199,6 +199,8 @@ func createThumbnail(in, out string, cut int) error {
 		return fmt.Errorf("New Capture Error:[%s]", in)
 	}
 	defer cap.Release()
+
+	//TODO SIZE チェック
 
 	frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
 	mod := frames / cut

@@ -8,6 +8,8 @@ import (
 )
 
 type AppConfig struct {
+	Width   int
+	Height  int
 	Default Default
 }
 

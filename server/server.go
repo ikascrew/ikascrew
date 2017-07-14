@@ -8,7 +8,6 @@ import (
 
 	"github.com/secondarykey/ikascrew"
 	"github.com/secondarykey/ikascrew/config"
-	"github.com/secondarykey/ikascrew/effect"
 	"github.com/secondarykey/ikascrew/video"
 )
 
@@ -48,17 +47,13 @@ func Start(d string) error {
 		return fmt.Errorf("Error:Video Load[%v]")
 	}
 
-	e, err := effect.NewNormal(v)
-	if err != nil {
-		return fmt.Errorf("Error:Effect")
-	}
-
-	win := ikascrew.NewWindow("ikascrew", e)
+	win := ikascrew.NewWindow("ikascrew")
 	ika := &IkascrewServer{
 		window: win,
 	}
 
+	//TODO サーバ起動失敗を見る
 	ika.startRPC()
 
-	return win.Play()
+	return win.Play(v)
 }

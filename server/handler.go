@@ -10,9 +10,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/effect"
 	"github.com/secondarykey/ikascrew/pb"
-	"github.com/secondarykey/ikascrew/video"
+	//"github.com/secondarykey/ikascrew/video"
 )
 
 func init() {
@@ -62,17 +61,13 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 
 	fmt.Printf("[%s]-[%s]\n", r.Type, r.Name)
 
-	v, err := video.Get(video.Type(r.Type), r.Name)
-	if err != nil {
-		return rep, err
-	}
+	//v, err := video.Get(video.Type(r.Type), r.Name)
+	//if err != nil {
+	//return rep, err
+	//}
 
-	e, err := effect.Get(effect.Type(r.Effect), v, i.window.GetEffect())
-	if err != nil {
-		return rep, err
-	}
-
-	i.window.SetEffect(e)
+	//TODO 切り替え処理
+	//i.window.SetEffect(e)
 
 	rep.Success = true
 	return rep, nil

@@ -15,12 +15,3 @@ type Video interface {
 
 	Release() error
 }
-
-type Effect interface {
-	Next() (*opencv.IplImage, error)
-
-	Wait() int
-	Release() error
-
-	String() string
-}

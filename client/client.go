@@ -2,12 +2,11 @@ package client
 
 import (
 	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/effect"
 	"github.com/secondarykey/ikascrew/video"
+	pm "github.com/secondarykey/powermate"
 )
 
 func init() {
-
 }
 
 type IkascrewClient struct {
@@ -33,14 +32,22 @@ func Start() error {
 		return err
 	}
 
-	n, err := effect.NewNormal(f)
-	if err != nil {
-		return err
-	}
-
-	ika.window = ikascrew.NewWindow("ikascrew client", n)
+	ika.window = ikascrew.NewWindow("ikascrew client")
 
 	ika.startHTTP()
-	ika.window.Play()
+
+	//Effect Handling
+	go func() {
+		pm.HandleFunc(ika.window.Effect)
+		err := pm.Listen("/dev/input/powermate")
+		if err != nil {
+			fmt.Println("Powermate not supported")
+		} else {
+			ika.window.PowerMate = true
+		}
+	}()
+
+	ika.window.Play(f)
+
 	return nil
 }

@@ -28,7 +28,7 @@ func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 	return r, nil
 }
 
-func (i *IkascrewClient) callSwitch(f string, t string, e string) error {
+func (i *IkascrewClient) callSwitch(f string, t string) error {
 
 	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
 	if err != nil {
@@ -38,9 +38,8 @@ func (i *IkascrewClient) callSwitch(f string, t string, e string) error {
 	c := pb.NewIkascrewClient(conn)
 
 	r, err := c.Effect(context.Background(), &pb.EffectRequest{
-		Name:   f,
-		Type:   t,
-		Effect: e,
+		Name: f,
+		Type: t,
 	})
 
 	if err != nil {
