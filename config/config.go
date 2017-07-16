@@ -3,8 +3,6 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
-
-	"github.com/secondarykey/ikascrew"
 )
 
 type AppConfig struct {
@@ -24,21 +22,9 @@ func init() {
 	conf = nil
 }
 
-func Get() (*AppConfig, error) {
+func Load(p string) (*AppConfig, error) {
 
-	if conf == nil {
-		wk, err := load()
-		if err != nil {
-			return nil, err
-		}
-		conf = wk
-	}
-	return conf, nil
-}
-
-func load() (*AppConfig, error) {
-
-	raw, err := ioutil.ReadFile(ikascrew.ProjectName() + "/app.json")
+	raw, err := ioutil.ReadFile(p + "/app.json")
 	if err != nil {
 		return nil, err
 	}

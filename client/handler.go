@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/secondarykey/ikascrew"
-	//"github.com/secondarykey/ikascrew/video"
+	"github.com/secondarykey/ikascrew/video"
 )
 
 const (
@@ -31,17 +31,20 @@ func (ika *IkascrewClient) loadHandler(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	//name := r.FormValue("name")
-	//t := r.FormValue("type")
+	name := r.FormValue("name")
+	t := r.FormValue("type")
 
-	//v, err := video.Get(video.Type(t), name)
-	//if err != nil {
-	//fmt.Println(err)
-	//return
-	//}
+	v, err := video.Get(video.Type(t), name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	//TODO 変更用の処理を作成？
-	//ika.window.SetEffect(e)
+	err = ika.window.Push(v)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 // switch

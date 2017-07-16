@@ -5,6 +5,7 @@ import (
 
 	"github.com/gordonklaus/portaudio"
 	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/secondarykey/ikascrew"
 	//"fmt"
 	//"time"
 )
@@ -18,6 +19,8 @@ type Microphone struct {
 	stream  *portaudio.Stream
 	dst     *opencv.IplImage
 	bg      *opencv.IplImage
+	w       int
+	h       int
 }
 
 func NewMicrophone() (*Microphone, error) {
@@ -27,8 +30,11 @@ func NewMicrophone() (*Microphone, error) {
 		frames:  make([]byte, 512),
 	}
 
-	m.dst = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
-	m.bg = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
+	m.w = ikascrew.Config.Width
+	m.h = ikascrew.Config.Height
+
+	m.dst = opencv.CreateImage(m.w, m.h, opencv.IPL_DEPTH_8U, 3)
+	m.bg = opencv.CreateImage(m.w, m.h, opencv.IPL_DEPTH_8U, 3)
 
 	//p1 := opencv.Point{0, 288}
 	//p2 := opencv.Point{1024, 288}
@@ -84,8 +90,8 @@ func (m *Microphone) Next() (*opencv.IplImage, error) {
 
 	for idx, byt := range wav {
 
-		x := 1024 / 2
-		y := 576 / 2
+		x := m.w / 2
+		y := m.h / 2
 		p1 := opencv.Point{x, y}
 
 		t := float64(idx) * 0.5

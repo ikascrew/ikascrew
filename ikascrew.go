@@ -2,12 +2,15 @@ package ikascrew
 
 import (
 	"fmt"
+	"github.com/secondarykey/ikascrew/config"
 )
 
 var project string
+var Config *config.AppConfig
 
 func init() {
 	project = ""
+	Config = nil
 }
 
 func ProjectName() string {
@@ -19,5 +22,13 @@ func Loading(name string) error {
 		project = name
 		fmt.Println("Project Name:", project)
 	}
+
+	conf, err := config.Load(project)
+	if err != nil {
+		return fmt.Errorf("Error Config[%v]", err)
+	}
+
+	Config = conf
+
 	return nil
 }

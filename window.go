@@ -15,19 +15,32 @@ type Window struct {
 	PowerMate bool
 }
 
-func NewWindow(name string) *Window {
+func NewWindow(name string) (*Window, error) {
+	var err error
 	rtn := &Window{}
 	win := opencv.NewWindow(name)
 	rtn.window = win
-	rtn.stream = &Stream{}
+	rtn.stream, err = NewStream()
+	if err != nil {
+		return nil, err
+	}
 	rtn.PowerMate = false
-	return rtn
+	return rtn, nil
+}
+
+func (w *Window) Push(v Video) error {
+	return w.stream.Push(v, w.PowerMate)
 }
 
 func (w *Window) Play(v Video) error {
-	w.stream.Push(v)
+
+	err := w.Push(v)
+	if err != nil {
+		return err
+	}
+
 	for {
-		img, err := w.stream.Next()
+		img, err := w.stream.Next(w.PowerMate)
 		if err != nil {
 			return err
 		}
@@ -42,20 +55,8 @@ func (w *Window) Play(v Video) error {
 	return fmt.Errorf("Error : Stream is nil")
 }
 
-func (w *Window) Event(e pm.Event) error {
-	switch e.Type {
-	case pm.Rotation:
-		switch e.Value {
-		case om.Left:
-		case om.Right:
-		}
-	case pm.Press:
-		switch e.Value {
-		case om.Up:
-		case om.Down:
-		}
-	default:
-	}
+func (w *Window) Effect(e pm.Event) error {
+	return w.stream.Effect(e)
 }
 
 func (w *Window) Destroy() {
@@ -65,4 +66,8 @@ func (w *Window) Destroy() {
 
 func (w *Window) FullScreen() {
 	w.window.SetProperty(opencv.CV_WND_PROP_FULLSCREEN, float64(opencv.CV_WINDOW_FULLSCREEN))
+}
+
+func (w *Window) Now() {
+	//TODO 現状の表示を取得
 }

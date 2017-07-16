@@ -18,7 +18,7 @@ func main() {
 	l := len(args)
 
 	if l < 1 {
-		fmt.Println("Error:ikascrew [init|server|client]")
+		fmt.Println("Error:ikascrew [init|server|client|create(until support)]")
 		os.Exit(1)
 	}
 
@@ -30,6 +30,9 @@ func main() {
 	}
 
 	var err error
+
+	// create mode
+	// create app.json
 
 	switch cmd {
 	case "init":

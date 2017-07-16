@@ -11,7 +11,7 @@ import (
 
 	"github.com/secondarykey/ikascrew"
 	"github.com/secondarykey/ikascrew/pb"
-	//"github.com/secondarykey/ikascrew/video"
+	"github.com/secondarykey/ikascrew/video"
 )
 
 func init() {
@@ -37,16 +37,15 @@ func (i *IkascrewServer) startRPC() error {
 	return nil
 }
 
-//func (i *IkascrewServer) FullScreen(ctx context.Context, r *pb.FullScreenRequest) (*pb.FullScreenReply, error) {
-//i.window.FullScreen()
-//}
-
 func (i *IkascrewServer) Sync(ctx context.Context, r *pb.SyncRequest) (*pb.SyncReply, error) {
 
 	i.window.FullScreen()
+
+	//TODO Now
+
 	rep := &pb.SyncReply{
-		Source:  "logo.png",
-		Type:    "image",
+		Source:  "wire/1.mp4",
+		Type:    "file",
 		Project: ikascrew.ProjectName(),
 	}
 
@@ -61,13 +60,13 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 
 	fmt.Printf("[%s]-[%s]\n", r.Type, r.Name)
 
-	//v, err := video.Get(video.Type(r.Type), r.Name)
-	//if err != nil {
-	//return rep, err
-	//}
+	v, err := video.Get(video.Type(r.Type), r.Name)
+	if err != nil {
+		return rep, err
+	}
 
 	//TODO 切り替え処理
-	//i.window.SetEffect(e)
+	i.window.Push(v)
 
 	rep.Success = true
 	return rep, nil

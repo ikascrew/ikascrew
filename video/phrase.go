@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/secondarykey/ikascrew"
 )
 
 var fonts []*opencv.Font
@@ -34,6 +35,9 @@ type Phrase struct {
 	now     []line
 	dst     *opencv.IplImage
 	bg      *opencv.IplImage
+
+	w int
+	h int
 }
 
 type line struct {
@@ -57,9 +61,11 @@ func NewPhrase(texts []string) (*Phrase, error) {
 	p.text = make([]string, len(texts))
 	copy(p.text, texts)
 
-	p.dst = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
-	//TODO 背景の画像？
-	p.bg = opencv.CreateImage(1024, 576, opencv.IPL_DEPTH_8U, 3)
+	p.w = ikascrew.Config.Width
+	p.h = ikascrew.Config.Height
+
+	p.dst = opencv.CreateImage(p.w, p.h, opencv.IPL_DEPTH_8U, 3)
+	p.bg = opencv.CreateImage(p.w, p.h, opencv.IPL_DEPTH_8U, 3)
 
 	return &p, nil
 }
@@ -77,9 +83,9 @@ func (p *Phrase) initialize() {
 			rt := rand.Intn(len(p.text))
 			p.now[idx].text = p.text[rt]
 
-			p.now[idx].x = 1024
+			p.now[idx].x = p.w
 
-			ry := rand.Intn(500)
+			ry := rand.Intn(p.h - 50)
 			p.now[idx].y = ry + 40
 			rr := rand.Intn(7)
 			p.now[idx].rate = rr + 3

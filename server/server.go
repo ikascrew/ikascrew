@@ -7,8 +7,9 @@ import (
 	"github.com/google/gops/agent"
 
 	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/config"
 	"github.com/secondarykey/ikascrew/video"
+
+	pm "github.com/secondarykey/powermate"
 )
 
 func init() {
@@ -26,34 +27,46 @@ type IkascrewServer struct {
 
 func Start(d string) error {
 
-	if err := agent.Listen(nil); err != nil {
+	var err error
+	err = agent.Listen(nil)
+	if err != nil {
 		return err
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	err := ikascrew.Loading(d)
+	err = ikascrew.Loading(d)
 
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}
 
-	app, err := config.Get()
+	v, err := video.Get(video.Type(ikascrew.Config.Default.Type), ikascrew.Config.Default.Name)
 	if err != nil {
-		return fmt.Errorf("Error:Config[%v]", err)
+		return fmt.Errorf("Error:Video Load[%v]", err)
 	}
 
-	v, err := video.Get(video.Type(app.Default.Type), app.Default.Name)
+	win, err := ikascrew.NewWindow("ikascrew")
 	if err != nil {
-		return fmt.Errorf("Error:Video Load[%v]")
+		return fmt.Errorf("Error:Create New Window[%v]", err)
 	}
 
-	win := ikascrew.NewWindow("ikascrew")
 	ika := &IkascrewServer{
 		window: win,
 	}
 
 	//TODO サーバ起動失敗を見る
 	ika.startRPC()
+
+	//Effect Handling
+	go func() {
+		pm.HandleFunc(ika.window.Effect)
+		err := pm.Listen("/dev/input/powermate")
+		if err != nil {
+			fmt.Println("Powermate not supported")
+		} else {
+			ika.window.PowerMate = true
+		}
+	}()
 
 	return win.Play(v)
 }
