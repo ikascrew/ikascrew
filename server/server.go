@@ -60,11 +60,11 @@ func Start(d string) error {
 	//Effect Handling
 	go func() {
 		pm.HandleFunc(ika.window.Effect)
+		ika.window.PowerMate = true
 		err := pm.Listen("/dev/input/powermate")
 		if err != nil {
-			fmt.Println("Powermate not supported")
-		} else {
-			ika.window.PowerMate = true
+			ika.window.PowerMate = false
+			fmt.Printf("Powermate not supported[%v]\n", err)
 		}
 	}()
 

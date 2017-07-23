@@ -2,6 +2,7 @@ package ikascrew
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/secondarykey/go-opencv/opencv"
 
@@ -9,6 +10,7 @@ import (
 )
 
 type Stream struct {
+	m        *sync.Mutex
 	resource map[string]Video
 
 	now_video Video
@@ -39,10 +41,12 @@ func NewStream() (*Stream, error) {
 	s.old_video = nil
 	s.release_video = nil
 
+	s.m = new(sync.Mutex)
+
 	return &s, nil
 }
 
-func (s *Stream) Push(v Video, support bool) error {
+func (s *Stream) Push(v Video) error {
 
 	if s.release_video != nil {
 		return fmt.Errorf("Until Switch")
@@ -59,6 +63,9 @@ func (s *Stream) Push(v Video, support bool) error {
 	s.old_value = s.now_value
 	s.now_value = 0
 
+	s.m.Lock()
+	defer s.m.Unlock()
+
 	s.release_video = s.old_video
 	s.old_video = s.now_video
 	s.now_video = v
@@ -69,6 +76,9 @@ func (s *Stream) Push(v Video, support bool) error {
 }
 
 func (s *Stream) Next(sw bool) (*opencv.IplImage, error) {
+
+	s.m.Lock()
+	defer s.m.Unlock()
 
 	old, err := s.getOldImage()
 	if err != nil {
@@ -134,10 +144,8 @@ func (s *Stream) Wait() int {
 }
 
 func (s *Stream) Release() error {
-
 	//Stream のリリースは終了時のみ行う
 	return nil
-
 }
 
 func (s *Stream) Effect(e pm.Event) error {
@@ -146,9 +154,9 @@ func (s *Stream) Effect(e pm.Event) error {
 	case pm.Rotation:
 		switch e.Value {
 		case pm.Left:
-			s.new_value--
+			s.now_value--
 		case pm.Right:
-			s.new_value++
+			s.now_value++
 		}
 	case pm.Press:
 		switch e.Value {

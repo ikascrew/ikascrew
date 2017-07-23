@@ -65,8 +65,10 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 		return rep, err
 	}
 
-	//TODO 切り替え処理
-	i.window.Push(v)
+	err = i.window.Push(v)
+	if err != nil {
+		return nil, err
+	}
 
 	rep.Success = true
 	return rep, nil

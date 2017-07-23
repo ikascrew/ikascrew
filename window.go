@@ -29,7 +29,7 @@ func NewWindow(name string) (*Window, error) {
 }
 
 func (w *Window) Push(v Video) error {
-	return w.stream.Push(v, w.PowerMate)
+	return w.stream.Push(v)
 }
 
 func (w *Window) Play(v Video) error {
