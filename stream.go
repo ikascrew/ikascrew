@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/ikascrew/go-opencv/opencv"
 
-	pm "github.com/secondarykey/powermate"
+	pm "github.com/ikascrew/powermate"
+	"github.com/ikascrew/xbox"
 )
 
 type Stream struct {
@@ -149,7 +150,6 @@ func (s *Stream) Release() error {
 }
 
 func (s *Stream) Effect(e pm.Event) error {
-
 	switch e.Type {
 	case pm.Rotation:
 		switch e.Value {
@@ -164,6 +164,26 @@ func (s *Stream) Effect(e pm.Event) error {
 		case pm.Down:
 		}
 	default:
+	}
+	return nil
+}
+
+func (s *Stream) EffectXbox(e xbox.Event) error {
+	if xbox.JudgeAxis(e, xbox.L2) {
+		val := e.Axes[xbox.L2]
+		if val > 15000 {
+			s.now_value--
+		}
+		s.now_value--
+		return nil
+	}
+	if xbox.JudgeAxis(e, xbox.R2) {
+		val := e.Axes[xbox.R2]
+		if val > 15000 {
+			s.now_value++
+		}
+		s.now_value++
+		return nil
 	}
 	return nil
 }

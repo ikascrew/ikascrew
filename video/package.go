@@ -3,7 +3,7 @@ package video
 import (
 	"fmt"
 
-	"github.com/secondarykey/ikascrew"
+	"github.com/ikascrew/ikascrew"
 )
 
 type Type string

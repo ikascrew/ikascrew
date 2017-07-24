@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/secondarykey/ikascrew/client"
-	"github.com/secondarykey/ikascrew/server"
-	"github.com/secondarykey/ikascrew/tool"
+	"github.com/ikascrew/ikascrew/client"
+	"github.com/ikascrew/ikascrew/server"
+	"github.com/ikascrew/ikascrew/tool"
 )
 
 func main() {

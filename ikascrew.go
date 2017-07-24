@@ -2,7 +2,7 @@ package ikascrew
 
 import (
 	"fmt"
-	"github.com/secondarykey/ikascrew/config"
+	"github.com/ikascrew/ikascrew/config"
 )
 
 var project string

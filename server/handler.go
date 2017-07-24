@@ -9,9 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/pb"
-	"github.com/secondarykey/ikascrew/video"
+	"github.com/ikascrew/ikascrew"
+	"github.com/ikascrew/ikascrew/pb"
+	"github.com/ikascrew/ikascrew/video"
 )
 
 func init() {

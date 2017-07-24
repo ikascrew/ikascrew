@@ -1,7 +1,7 @@
 package ikascrew
 
 import (
-	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/ikascrew/go-opencv/opencv"
 )
 
 type Video interface {

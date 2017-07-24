@@ -2,8 +2,10 @@ package ikascrew
 
 import (
 	"fmt"
-	"github.com/secondarykey/go-opencv/opencv"
-	pm "github.com/secondarykey/powermate"
+
+	"github.com/ikascrew/go-opencv/opencv"
+	pm "github.com/ikascrew/powermate"
+	"github.com/ikascrew/xbox"
 )
 
 func init() {
@@ -57,6 +59,10 @@ func (w *Window) Play(v Video) error {
 
 func (w *Window) Effect(e pm.Event) error {
 	return w.stream.Effect(e)
+}
+
+func (w *Window) EffectXbox(e xbox.Event) error {
+	return w.stream.EffectXbox(e)
 }
 
 func (w *Window) Destroy() {

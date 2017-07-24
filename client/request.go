@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/secondarykey/ikascrew/pb"
+	"github.com/ikascrew/ikascrew/pb"
 )
 
 func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {

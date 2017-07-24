@@ -6,10 +6,11 @@ import (
 
 	"github.com/google/gops/agent"
 
-	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/video"
+	"github.com/ikascrew/ikascrew"
+	"github.com/ikascrew/ikascrew/video"
 
-	pm "github.com/secondarykey/powermate"
+	//pm "github.com/ikascrew/powermate"
+	"github.com/ikascrew/xbox"
 )
 
 func init() {
@@ -58,13 +59,25 @@ func Start(d string) error {
 	ika.startRPC()
 
 	//Effect Handling
+	/*
+		go func() {
+			pm.HandleFunc(ika.window.Effect)
+			ika.window.PowerMate = true
+			err := pm.Listen("/dev/input/powermate")
+			if err != nil {
+				ika.window.PowerMate = false
+				fmt.Printf("Powermate not supported[%v]\n", err)
+			}
+		}()
+	*/
+
 	go func() {
-		pm.HandleFunc(ika.window.Effect)
+		xbox.HandlerFunc(ika.window.EffectXbox)
 		ika.window.PowerMate = true
-		err := pm.Listen("/dev/input/powermate")
+		err := xbox.Listen(0)
 		if err != nil {
 			ika.window.PowerMate = false
-			fmt.Printf("Powermate not supported[%v]\n", err)
+			fmt.Printf("Xbox Controller not supported[%v]\n", err)
 		}
 	}()
 

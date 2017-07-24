@@ -4,8 +4,8 @@ import (
 	"math"
 
 	"github.com/gordonklaus/portaudio"
-	"github.com/secondarykey/go-opencv/opencv"
-	"github.com/secondarykey/ikascrew"
+	"github.com/ikascrew/go-opencv/opencv"
+	"github.com/ikascrew/ikascrew"
 	//"fmt"
 	//"time"
 )

@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/secondarykey/go-opencv/opencv"
+	"github.com/ikascrew/go-opencv/opencv"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -251,7 +251,7 @@ func createThumbnail(in, out string, cut int) error {
 
 	l := len(images)
 	thumb.ResetROI()
-	resize := opencv.Resize(thumb, int(left/l/2), int(height/l/2), opencv.CV_INTER_LINEAR)
+	resize := opencv.Resize(thumb, int(left/l), int(height/l), opencv.CV_INTER_LINEAR)
 	img := resize.ToImage()
 
 	outFile, err := os.Create(out)

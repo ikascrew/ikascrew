@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/secondarykey/ikascrew"
-	"github.com/secondarykey/ikascrew/video"
+	"github.com/ikascrew/ikascrew"
+	"github.com/ikascrew/ikascrew/video"
 )
 
 const (
