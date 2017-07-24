@@ -72,7 +72,7 @@ func Start(d string) error {
 	*/
 
 	go func() {
-		xbox.HandlerFunc(ika.window.EffectXbox)
+		xbox.HandleFunc(ika.window.EffectXbox)
 		ika.window.PowerMate = true
 		err := xbox.Listen(0)
 		if err != nil {

@@ -1,8 +1,11 @@
 package client
 
 import (
+	"log"
+
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/video"
+	"github.com/ikascrew/xbox"
 )
 
 func init() {
@@ -37,7 +40,22 @@ func Start() error {
 		return err
 	}
 
-	ika.startHTTP()
+	//ika.startHTTP()
+
+	go func() {
+		err := display(rep.Project)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	xbox.HandleFunc(ika.controller)
+	go func() {
+		err := xbox.Listen(0)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	ika.window.Play(f)
 
