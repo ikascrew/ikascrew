@@ -55,24 +55,11 @@ func Start(d string) error {
 		window: win,
 	}
 
-	//TODO サーバ起動失敗を見る
 	ika.startRPC()
-
-	//Effect Handling
-	/*
-		go func() {
-			pm.HandleFunc(ika.window.Effect)
-			ika.window.PowerMate = true
-			err := pm.Listen("/dev/input/powermate")
-			if err != nil {
-				ika.window.PowerMate = false
-				fmt.Printf("Powermate not supported[%v]\n", err)
-			}
-		}()
-	*/
 
 	go func() {
 		xbox.HandleFunc(ika.window.EffectXbox)
+		xbox.SetDuration(45)
 		ika.window.PowerMate = true
 		err := xbox.Listen(0)
 		if err != nil {

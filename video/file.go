@@ -20,7 +20,6 @@ type File struct {
 
 func NewFile(file string) (*File, error) {
 
-	//設定値
 	f := File{
 		name: file,
 	}
@@ -29,6 +28,7 @@ func NewFile(file string) (*File, error) {
 	if f.cap == nil {
 		return nil, fmt.Errorf("New Capture Error:[%s]", f)
 	}
+
 	f.fps = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FPS))
 	f.frames = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
 

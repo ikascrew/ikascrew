@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikascrew/ikascrew/client"
-	"github.com/ikascrew/ikascrew/server"
+	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/tool"
 )
 
@@ -18,15 +17,18 @@ func main() {
 	l := len(args)
 
 	if l < 1 {
-		fmt.Println("Error:ikascrew [init|server|client|create(until support)]")
-		os.Exit(1)
 	}
 
 	cmd := args[0]
 
 	var project string
+	var file string
 	if l >= 2 {
 		project = args[1]
+	}
+
+	if l >= 3 {
+		file = args[2]
 	}
 
 	var err error
@@ -36,13 +38,27 @@ func main() {
 
 	switch cmd {
 	case "init":
-		err = tool.CreateProject(project)
-	case "server":
-		err = server.Start(project)
-	case "client":
-		err = client.Start()
+		if project == "" {
+			err = fmt.Errorf("Required:ProjectName")
+		} else {
+			err = tool.CreateProject(project)
+		}
+	case "start":
+		if project == "" {
+			err = fmt.Errorf("Required:ProjectName")
+		} else {
+			err = ikascrew.Start(project)
+		}
+	case "test":
+		if project == "" {
+			err = fmt.Errorf("Required:ProjectName")
+		} else if file == "" {
+			err = fmt.Errorf("Required:Filename")
+		} else {
+			err = ikascrew.TestMode(project, file)
+		}
 	default:
-		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
+		err = fmt.Errorf("Error:ikascrew command[init|server|client|test]")
 	}
 
 	if err != nil {

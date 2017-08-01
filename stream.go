@@ -2,7 +2,6 @@ package ikascrew
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/ikascrew/go-opencv/opencv"
 
@@ -11,9 +10,6 @@ import (
 )
 
 type Stream struct {
-	m        *sync.Mutex
-	resource map[string]Video
-
 	now_video Video
 	now_value float64
 	now_image *opencv.IplImage
@@ -30,7 +26,6 @@ const SWITCH_VALUE = 200
 func NewStream() (*Stream, error) {
 
 	s := Stream{}
-	s.resource = make(map[string]Video)
 
 	s.now_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
 	s.old_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
@@ -42,44 +37,54 @@ func NewStream() (*Stream, error) {
 	s.old_video = nil
 	s.release_video = nil
 
-	s.m = new(sync.Mutex)
+	used = make(map[string]bool)
 
 	return &s, nil
 }
 
+var used map[string]bool
+
 func (s *Stream) Push(v Video) error {
 
-	if s.release_video != nil {
-		return fmt.Errorf("Until Switch")
+	if used[v.Source()] {
+		return fmt.Errorf("until used video")
 	}
+	used[v.Source()] = true
 
-	_, ok := s.resource[v.Source()]
-	if ok {
-		return fmt.Errorf("Exist Video[%s]", v.Source())
-	}
-
-	s.resource[v.Source()] = v
-
-	//次が来たらMateの対象にする
 	s.old_value = s.now_value
 	s.now_value = 0
 
-	s.m.Lock()
-	defer s.m.Unlock()
+	wk := s.release_video
+	if wk != nil {
+		delete(used, wk.Source())
+		defer wk.Release()
+	}
 
 	s.release_video = s.old_video
 	s.old_video = s.now_video
 	s.now_video = v
 
-	fmt.Println("Push")
+	//s.print_videos("Push")
 
 	return nil
 }
 
-func (s *Stream) Next(sw bool) (*opencv.IplImage, error) {
+func (s *Stream) PrintVideos(line string) {
+	fmt.Println(line + "-------------------------------------------------")
+	if s.now_video != nil {
+		fmt.Println("[1]" + s.now_video.Source())
+	}
 
-	s.m.Lock()
-	defer s.m.Unlock()
+	if s.old_video != nil {
+		fmt.Println("[2]" + s.old_video.Source())
+	}
+
+	if s.release_video != nil {
+		fmt.Println("[3]" + s.release_video.Source())
+	}
+}
+
+func (s *Stream) Next() (*opencv.IplImage, error) {
 
 	old, err := s.getOldImage()
 	if err != nil {
@@ -87,24 +92,16 @@ func (s *Stream) Next(sw bool) (*opencv.IplImage, error) {
 	}
 
 	if old == nil {
+		fmt.Println("old == nil")
 		return s.now_video.Next()
 	}
 
-	if !sw {
-		s.now_value++
-		// 切り替え前のビデオを削除
-		if s.now_value == SWITCH_VALUE {
-			defer func() {
-				s.old_video.Release()
-				s.old_video = nil
-			}()
-		}
-	}
-
 	alpha := s.now_value / SWITCH_VALUE
-
 	next, _ := s.now_video.Next()
 	opencv.AddWeighted(next, float64(alpha), old, float64(1.0-alpha), 0.0, s.now_image)
+
+	fmt.Println("Next OK")
+
 	return s.now_image, nil
 
 }
@@ -119,11 +116,11 @@ func (s *Stream) getOldImage() (*opencv.IplImage, error) {
 	}
 
 	//完全に切り替える方向に持っていく
-	if s.old_value > SWITCH_VALUE {
-		s.old_value--
-	} else if s.old_value < SWITCH_VALUE {
-		s.old_value++
-	}
+	//if s.old_value > SWITCH_VALUE {
+	//s.old_value--
+	//} else if s.old_value < SWITCH_VALUE {
+	//s.old_value++
+	//}
 
 	alpha := s.old_value / SWITCH_VALUE
 
@@ -132,11 +129,10 @@ func (s *Stream) getOldImage() (*opencv.IplImage, error) {
 
 	opencv.AddWeighted(next, float64(alpha), now, float64(1.0-alpha), 0.0, s.old_image)
 
-	if s.old_value == SWITCH_VALUE {
-		s.release_video.Release()
-
-		s.release_video = nil
-	}
+	//if s.old_value == SWITCH_VALUE {
+	//s.release_video.Release()
+	//s.release_video = nil
+	//}
 	return s.old_image, nil
 }
 

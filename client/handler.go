@@ -26,7 +26,6 @@ func (ika *IkascrewClient) startHTTP() {
 	}()
 }
 
-// load
 func (ika *IkascrewClient) loadHandler(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()

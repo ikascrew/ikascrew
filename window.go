@@ -2,19 +2,36 @@ package ikascrew
 
 import (
 	"fmt"
+	"sync"
+
+	"golang.org/x/exp/shiny/driver"
+	"golang.org/x/exp/shiny/screen"
+	"golang.org/x/mobile/event/lifecycle"
+	"golang.org/x/mobile/event/paint"
 
 	"github.com/ikascrew/go-opencv/opencv"
 	pm "github.com/ikascrew/powermate"
 	"github.com/ikascrew/xbox"
+
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
+	_ "golang.org/x/image/webp"
 )
 
 func init() {
 }
 
 type Window struct {
-	stream    *Stream
-	window    *opencv.Window
-	PowerMate bool
+	stream *Stream
+	window *opencv.Window
+
+	wait chan Video
+	m    *sync.Mutex
 }
 
 func NewWindow(name string) (*Window, error) {
@@ -26,34 +43,116 @@ func NewWindow(name string) (*Window, error) {
 	if err != nil {
 		return nil, err
 	}
-	rtn.PowerMate = false
+
+	rtn.m = new(sync.Mutex)
+	rtn.wait = make(chan Video, 100)
+
 	return rtn, nil
 }
 
 func (w *Window) Push(v Video) error {
-	return w.stream.Push(v)
+	//return w.stream.Push(v)
+
+	w.stream.PrintVideos("Push Start")
+	w.wait <- v
+
+	w.stream.PrintVideos("Push End")
+	return nil
 }
 
 func (w *Window) Play(v Video) error {
 
-	err := w.Push(v)
+	err := w.stream.Push(v)
 	if err != nil {
 		return err
 	}
 
-	for {
-		img, err := w.stream.Next(w.PowerMate)
-		if err != nil {
-			return err
+	js, err := xbox.Open(0)
+	if err != nil {
+		return fmt.Errorf("Joystick open error.[%v]", err)
+	}
+
+	exchange(ProjectName())
+
+	driver.Main(func(s screen.Screen) {
+		width := 2048
+		height := 192
+		opt := &screen.NewWindowOptions{
+			Title:  "ikascrew movie viewer",
+			Width:  width,
+			Height: height,
 		}
 
-		if img != nil {
-			w.window.ShowImage(img)
-			opencv.WaitKey(w.stream.Wait())
-		} else {
-			fmt.Println("Next() Image Nil!!!")
+		shiny, err := s.NewWindow(opt)
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
-	}
+		defer shiny.Release()
+		win = shiny
+
+		winSize := image.Point{width, height}
+		b, err := s.NewBuffer(winSize)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer b.Release()
+
+		for {
+
+			w.m.Lock()
+			fmt.Println("for Lock")
+			switch e := shiny.NextEvent().(type) {
+			case lifecycle.Event:
+				if e.To == lifecycle.StageDead {
+					return
+				}
+			case paint.Event:
+				fmt.Println("draw")
+				draw(b.RGBA(), current)
+				fmt.Println("upload")
+				shiny.Upload(image.Point{}, b, b.Bounds())
+				fmt.Println("publish")
+				shiny.Publish()
+			}
+			select {
+			case v := <-w.wait:
+				fmt.Println("stream Push")
+				err := w.stream.Push(v)
+				fmt.Println("stream End")
+				if err != nil {
+					fmt.Println("Error")
+				}
+			default:
+				w.stream.PrintVideos("Next() Start")
+				img, err := w.stream.Next()
+				if err != nil {
+				}
+
+				if img != nil {
+
+					fmt.Println("ShowImage")
+					w.window.ShowImage(img)
+
+					if err != nil {
+					}
+					opencv.WaitKey(w.stream.Wait())
+
+					err := Controller(js)
+					if err != nil {
+						fmt.Println("Controller error")
+					}
+
+				} else {
+					fmt.Println("Next() Image Nil!!!")
+				}
+			}
+			fmt.Println("for unlock")
+			w.m.Unlock()
+		}
+	})
+
 	return fmt.Errorf("Error : Stream is nil")
 }
 

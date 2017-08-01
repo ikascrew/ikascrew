@@ -1,15 +1,12 @@
 package video
 
 import (
-	"math/rand"
-	"time"
-
 	"github.com/ikascrew/go-opencv/opencv"
-	"github.com/ikascrew/ikascrew"
 )
 
 var fonts []*opencv.Font
 
+/*
 func init() {
 
 	color1 := opencv.NewScalar(255, 255, 204, 0)
@@ -136,3 +133,4 @@ func (v *Phrase) Release() error {
 	v.dst.Release()
 	return nil
 }
+*/
