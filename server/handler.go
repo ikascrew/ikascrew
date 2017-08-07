@@ -60,7 +60,7 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 
 	fmt.Printf("[%s]-[%s]\n", r.Type, r.Name)
 
-	v, err := video.Get(video.Type(r.Type), r.Name)
+	v, err := video.Get("", r.Name)
 	if err != nil {
 		return rep, err
 	}

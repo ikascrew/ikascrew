@@ -5,107 +5,97 @@ import (
 	"log"
 
 	"github.com/ikascrew/ikascrew"
-	"github.com/ikascrew/ikascrew/video"
-
 	"github.com/ikascrew/xbox"
+
+	"golang.org/x/mobile/event/paint"
 )
 
 func init() {
 }
 
 type IkascrewClient struct {
-	window *ikascrew.Window
+	selector *selector
+	player   *player
+	pusher   *pusher
 }
 
 func Start() error {
 
 	var err error
+
+	//sync
+	d := "projects/20170817"
+
 	ika := &IkascrewClient{}
-
-	rep, err := ika.syncServer()
+	err = ikascrew.Loading(d)
 	if err != nil {
 		return err
 	}
 
-	err = ikascrew.Loading(rep.Project)
+	selector, err := NewSelector(d)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	ika.window, err = ikascrew.NewWindow("ikascrew client")
+	pusher, err := NewPusher()
 	if err != nil {
-		return err
-	}
-	v, err := video.Get(video.Type(rep.Type), rep.Source)
-	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	go func() {
-		err := display(rep.Project)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	player, err := NewPlayer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ika.selector = selector
+	ika.player = player
+	ika.pusher = pusher
 
 	xbox.HandleFunc(ika.controller)
-	//return xbox.Listen(0)
-	go func() {
-		err := xbox.Listen(0)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	return ika.window.Play(v)
+	err = xbox.Listen(0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }
 
-func TestMode(p string, n string) error {
+var X bool
+var A bool
 
-	var err error
-	ika := &IkascrewClient{}
+func (ika *IkascrewClient) controller(e xbox.Event) error {
 
-	err = ikascrew.Loading(p)
-	if err != nil {
-		return err
+	if xbox.JudgeAxis(e, xbox.JOY_L_VERTICAL) {
+		ika.selector.setCursor(e.Axes[xbox.JOY_L_VERTICAL])
+		ika.selector.win.Send(paint.Event{})
 	}
 
-	ika.window, err = ikascrew.NewWindow("ikascrew client test")
-	if err != nil {
-		return err
+	if xbox.JudgeAxis(e, xbox.JOY_R_HORIZONTAL) {
+		ika.pusher.setCursor(e.Axes[xbox.JOY_R_HORIZONTAL])
+		ika.pusher.win.Send(paint.Event{})
 	}
 
-	v, err := video.Get(video.Type("file"), n)
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		err := display(p)
+	if e.Buttons[xbox.X] && X {
+		X = false
+		err := ika.callSwitch(ika.pusher.get(), "file")
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
-	}()
+	} else if !e.Buttons[xbox.X] {
+		X = true
+	}
 
-	xbox.HandleFunc(ika.controller)
-	//return xbox.Listen(0)
-	go func() {
-		err := xbox.Listen(0)
+	if e.Buttons[xbox.A] && A {
+
+		A = false
+		fmt.Printf("[%s]\n", ika.selector.get())
+		err := ika.pusher.add(ika.selector.get())
 		if err != nil {
-			fmt.Println("Not Support Xbox")
+			fmt.Println(err)
 		}
-	}()
 
-	ika.xboxHandleFunc(ika.xboxController)
-	//return xbox.Listen(0)
-	/*
-		go func() {
-			err := ika.xboxListen()
-			if err != nil {
-				fmt.Println("Not Support Xbox")
-			}
-		}()
-	*/
+	} else if !e.Buttons[xbox.A] {
+		A = true
+	}
 
-	return ika.window.Play(v)
+	return nil
 }

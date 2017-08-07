@@ -23,6 +23,7 @@ import (
 var current image.Image
 var idx int
 var win screen.Window
+
 var images []string
 var resources []string
 
@@ -51,11 +52,6 @@ func exchange(dir string) {
 		resources[idx] = path
 	}
 
-}
-
-func display(dir string) error {
-
-	return nil
 }
 
 func load(filename string) (image.Image, error) {

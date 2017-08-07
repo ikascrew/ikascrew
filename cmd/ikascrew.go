@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikascrew/ikascrew"
+	"github.com/ikascrew/ikascrew/client"
+	"github.com/ikascrew/ikascrew/server"
 	"github.com/ikascrew/ikascrew/tool"
 )
 
@@ -22,20 +23,11 @@ func main() {
 	cmd := args[0]
 
 	var project string
-	var file string
 	if l >= 2 {
 		project = args[1]
 	}
 
-	if l >= 3 {
-		file = args[2]
-	}
-
 	var err error
-
-	// create mode
-	// create app.json
-
 	switch cmd {
 	case "init":
 		if project == "" {
@@ -43,20 +35,14 @@ func main() {
 		} else {
 			err = tool.CreateProject(project)
 		}
-	case "start":
+	case "server":
 		if project == "" {
 			err = fmt.Errorf("Required:ProjectName")
 		} else {
-			err = ikascrew.Start(project)
+			err = server.Start(project)
 		}
-	case "test":
-		if project == "" {
-			err = fmt.Errorf("Required:ProjectName")
-		} else if file == "" {
-			err = fmt.Errorf("Required:Filename")
-		} else {
-			err = ikascrew.TestMode(project, file)
-		}
+	case "client":
+		err = client.Start()
 	default:
 		err = fmt.Errorf("Error:ikascrew command[init|server|client|test]")
 	}

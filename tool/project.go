@@ -2,7 +2,6 @@ package tool
 
 import (
 	"fmt"
-	"html/template"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
@@ -19,22 +18,24 @@ type Movie struct {
 	Image string
 }
 
-// Effectを元に戻す undo()
+const TMP = ".tmp"
+const THUMB = "thumb"
+const ICON = "icon"
 
 func CreateProject(dir string) error {
 
-	public := dir + "/.public"
-	thumb := public + "/thumb"
-	images := public + "/images"
+	tmp := dir + "/" + TMP
+	thumb := tmp + "/" + THUMB
+	icon := tmp + "/" + ICON
 
 	err := os.MkdirAll(thumb, 0777)
 	if err != nil {
 		return fmt.Errorf("Error make directory:%s", thumb)
 	}
 
-	err = os.MkdirAll(images, 0777)
+	err = os.MkdirAll(icon, 0777)
 	if err != nil {
-		return fmt.Errorf("Error make directory:%s", images)
+		return fmt.Errorf("Error make directory:%s", icon)
 	}
 
 	files, err := search(dir)
@@ -43,58 +44,69 @@ func CreateProject(dir string) error {
 	}
 
 	movies := make([]Movie, len(files))
-
 	bar := pb.StartNew(len(files)).Prefix("Create Thumbnail")
+
+	cut := 2
+
 	for idx, f := range files {
 
 		movie := Movie{}
-
 		work := strings.Replace(f, dir, "", 1)
 
 		ft := "file"
 
-		if strings.LastIndex(work, ".jpg") == len(work)-4 ||
-			strings.LastIndex(work, ".png") == len(work)-4 {
+		if isImage(work) {
 
 			ft = "image"
-			movie.Image = "thumb" + work
+			movie.Image = THUMB + work
 
 			out := thumb + work
 			mkIdx := strings.LastIndex(out, "/")
-			tmp := string(out[:mkIdx])
+			d := string(out[:mkIdx])
+			err = os.MkdirAll(d, 0777)
 
-			err = os.MkdirAll(tmp, 0777)
-
-			// read the whole file at once
-			b, err := ioutil.ReadFile(f)
+			err = createThumbnail(f, out, cut)
 			if err != nil {
-				return fmt.Errorf("Error Read Image File[%s]:%s", f, err)
+				return fmt.Errorf("Error Create Thumbnail:%s", err)
 			}
 
-			// write the whole body at once
-			err = ioutil.WriteFile(out, b, 0644)
+			out = icon + work
+			mkIdx = strings.LastIndex(out, "/")
+			tmp = string(out[:mkIdx])
+			err = os.MkdirAll(tmp, 0777)
+
+			err = createIcon(f, out)
 			if err != nil {
-				return fmt.Errorf("Error Write Image File[%s]:%s", out, err)
+				return fmt.Errorf("Error Create Icon:%s", err)
 			}
 
 		} else {
 
 			jpg := strings.Replace(work, ".mp4", ".jpg", 1)
-
-			movie.Image = "thumb" + jpg
-
+			movie.Image = THUMB + jpg
 			out := thumb + jpg
 
 			mkIdx := strings.LastIndex(out, "/")
 			tmp := string(out[:mkIdx])
 
 			err = os.MkdirAll(tmp, 0777)
-
-			err = createThumbnail(f, out, 5)
+			err = createThumbnail(f, out, cut)
 			if err != nil {
 				return fmt.Errorf("Error Create Thumbnail:%s", err)
 			}
+
+			out = icon + jpg
+			mkIdx = strings.LastIndex(out, "/")
+			tmp = string(out[:mkIdx])
+			err = os.MkdirAll(tmp, 0777)
+
+			err = createIcon(f, out)
+			if err != nil {
+				return fmt.Errorf("Error Create Icon:%s", err)
+			}
+
 		}
+
 		movie.Name = string(work[1:])
 		movie.Type = string(ft)
 
@@ -108,51 +120,17 @@ func CreateProject(dir string) error {
 		Type: "mic",
 	}
 	movies = append(movies, tw)
-
-	bar = pb.StartNew(4).Prefix("Generate Controll page")
-	tmpl, err := template.ParseFiles("templates/index.tmpl")
-	if err != nil {
-		return fmt.Errorf("Error Create Template:%s", err)
-	}
-
-	index, err := os.Create(public + "/index.html")
-	if err != nil {
-		return fmt.Errorf("Error Create index:%s", err)
-	}
-
-	err = tmpl.Execute(index, movies)
-	if err != nil {
-		return fmt.Errorf("Error Create Index:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/sub.tmpl", public+"/sub.html")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/styles.css", public+"/styles.css")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/images/logo.png", images+"/logo.png")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
-	err = copyFile("templates/jquery-3.1.1.min.js", public+"/jquery-3.1.1.min.js")
-	if err != nil {
-		return fmt.Errorf("Error Copy:%s", err)
-	}
-	bar.Increment()
-
 	bar.FinishPrint("Controller Completion")
 
 	return nil
+}
+
+func isImage(f string) bool {
+	if strings.LastIndex(f, ".jpg") == len(f)-4 ||
+		strings.LastIndex(f, ".png") == len(f)-4 {
+		return true
+	}
+	return false
 }
 
 func search(d string) ([]string, error) {
@@ -163,7 +141,7 @@ func search(d string) ([]string, error) {
 	}
 
 	rtn := make([]string, 0)
-	if strings.Index(d, ".public") != -1 {
+	if strings.Index(d, TMP) != -1 {
 		return rtn, nil
 	}
 
@@ -191,44 +169,86 @@ func search(d string) ([]string, error) {
 	return rtn, nil
 }
 
-func createThumbnail(in, out string, cut int) error {
+func createIcon(in, out string) error {
 
-	// load movie
-	cap := opencv.NewFileCapture(in)
-	if cap == nil {
-		return fmt.Errorf("New Capture Error:[%s]", in)
+	var ipl *opencv.IplImage
+	if isImage(in) {
+		ipl = opencv.LoadImage(in)
+	} else {
+		cap := opencv.NewFileCapture(in)
+		if cap == nil {
+			return fmt.Errorf("New Capture Error:[%s]", in)
+		}
+		defer cap.Release()
+		frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
+
+		center := frames / 2
+		cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(center))
+		img := cap.QueryFrame()
+		ipl = img.Clone()
 	}
-	defer cap.Release()
 
-	//TODO SIZE チェック
+	defer ipl.Release()
+	resize := opencv.Resize(ipl, 512, 288, opencv.CV_INTER_LINEAR)
+	defer resize.Release()
 
-	frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
-	mod := frames / cut
+	img := resize.ToImage()
+	outFile, err := os.Create(out)
+	if err != nil {
+		return fmt.Errorf("Error OpenFile[%s]:%s", out, err)
+	}
+	defer outFile.Close()
+
+	option := &jpeg.Options{Quality: 100}
+	if err = jpeg.Encode(outFile, img, option); err != nil {
+		return fmt.Errorf("Error Encode:%s", err)
+	}
+	return nil
+}
+
+func createThumbnail(in, out string, cut int) error {
 
 	images := make([]*opencv.IplImage, cut+1)
 	width := 0
 	height := 0
-
-	// get thumb
 	frame := 0
-	for idx := 0; idx < len(images); idx++ {
 
-		img := cap.QueryFrame()
-		for img == nil {
-			frame = frame - 5
-			cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
-			img = cap.QueryFrame()
+	if isImage(in) {
+
+		ipl := opencv.LoadImage(in)
+		defer ipl.Release()
+		for idx := 0; idx < len(images); idx++ {
+			images[idx] = ipl.Clone()
+			width += ipl.Width()
+			height = ipl.Height()
 		}
-		images[idx] = img.Clone()
 
-		width += img.Width()
-		height = img.Height()
+	} else {
+		cap := opencv.NewFileCapture(in)
+		if cap == nil {
+			return fmt.Errorf("New Capture Error:[%s]", in)
+		}
+		defer cap.Release()
 
-		frame = mod * (idx + 1)
-		cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
+		frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
+		mod := frames / cut
+
+		for idx := 0; idx < len(images); idx++ {
+			img := cap.QueryFrame()
+			for img == nil {
+				frame = frame - 5
+				cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
+				img = cap.QueryFrame()
+			}
+			images[idx] = img.Clone()
+
+			width += img.Width()
+			height = img.Height()
+
+			frame = mod * (idx + 1)
+			cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
+		}
 	}
-
-	//create thumb
 
 	thumb := opencv.CreateImage(width, height, opencv.IPL_DEPTH_8U, 3)
 	defer thumb.Release()
@@ -247,11 +267,11 @@ func createThumbnail(in, out string, cut int) error {
 		left += elm.Width()
 	}
 
-	//generate thumb
-
 	l := len(images)
 	thumb.ResetROI()
-	resize := opencv.Resize(thumb, int(left/l*2), int(height/l*2), opencv.CV_INTER_LINEAR)
+	resize := opencv.Resize(thumb, int(left/l/2), int(height/l/2), opencv.CV_INTER_LINEAR)
+	defer resize.Release()
+
 	img := resize.ToImage()
 
 	outFile, err := os.Create(out)
