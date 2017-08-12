@@ -1,18 +1,17 @@
 package video
 
 import (
-//"encoding/json"
-//"fmt"
-//"io/ioutil"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 
-//"github.com/dghubble/go-twitter/twitter"
-//"github.com/dghubble/oauth1"
+	"github.com/dghubble/go-twitter/twitter"
+	"github.com/dghubble/oauth1"
 )
 
 func init() {
 }
 
-/*
 type Twitter struct {
 	*Phrase
 	word string
@@ -55,9 +54,9 @@ func (t *Twitter) search() ([]string, error) {
 	}
 
 	param.Count = 100
-		if app.MaxId != 0 {
-			param.SinceID = app.MaxId
-		}
+	//if app.MaxId != 0 {
+	//param.SinceID = app.MaxId
+	//}
 	// Search Tweets
 	search, _, err := client.Search.Tweets(param)
 	if err != nil {
@@ -112,4 +111,3 @@ func (t *Twitter) initialize() {
 func (v *Twitter) Source() string {
 	return "_ikascrew_Twitter.mp4"
 }
-*/

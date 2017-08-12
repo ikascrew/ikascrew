@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ikascrew/go-opencv/opencv"
+
 	"gopkg.in/cheggaaa/pb.v1"
 )
 

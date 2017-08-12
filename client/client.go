@@ -8,6 +8,8 @@ import (
 	"github.com/ikascrew/xbox"
 
 	"golang.org/x/mobile/event/paint"
+
+	"github.com/golang/glog"
 )
 
 func init() {
@@ -23,7 +25,7 @@ func Start() error {
 
 	var err error
 
-	//sync
+	//TODO server sync
 	d := "projects/20170817"
 
 	ika := &IkascrewClient{}
@@ -36,24 +38,28 @@ func Start() error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	ika.selector = selector
 
 	pusher, err := NewPusher()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	player, err := NewPlayer()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ika.selector = selector
-	ika.player = player
 	ika.pusher = pusher
+
+	/*
+		player, err := NewPlayer()
+		if err != nil {
+			log.Fatal(err)
+		}
+		ika.player = player
+	*/
 
 	xbox.HandleFunc(ika.controller)
 	err = xbox.Listen(0)
 	if err != nil {
+
+		//TODO startHTTP?
+
 		log.Fatal(err)
 	}
 	return nil
@@ -87,10 +93,10 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 	if e.Buttons[xbox.A] && A {
 
 		A = false
-		fmt.Printf("[%s]\n", ika.selector.get())
 		err := ika.pusher.add(ika.selector.get())
 		if err != nil {
-			fmt.Println(err)
+			// TODO 無視
+			glog.Error("pusher add Error:", err)
 		}
 
 	} else if !e.Buttons[xbox.A] {

@@ -6,7 +6,8 @@ import (
 	"github.com/ikascrew/go-opencv/opencv"
 
 	pm "github.com/ikascrew/powermate"
-	"github.com/ikascrew/xbox"
+
+	"github.com/golang/glog"
 )
 
 type Stream struct {
@@ -64,27 +65,25 @@ func (s *Stream) Push(v Video) error {
 	s.old_video = s.now_video
 	s.now_video = v
 
-	//s.print_videos("Push")
-
 	return nil
 }
 
 func (s *Stream) PrintVideos(line string) {
-	fmt.Println(line + "-------------------------------------------------")
+	glog.Info(line + "-------------------------------------------------")
 	if s.now_video != nil {
-		fmt.Println("[1]" + s.now_video.Source())
+		glog.Info("[1]" + s.now_video.Source())
 	}
 
 	if s.old_video != nil {
-		fmt.Println("[2]" + s.old_video.Source())
+		glog.Info("[2]" + s.old_video.Source())
 	}
 
 	if s.release_video != nil {
-		fmt.Println("[3]" + s.release_video.Source())
+		glog.Info("[3]" + s.release_video.Source())
 	}
 }
 
-func (s *Stream) Next() (*opencv.IplImage, error) {
+func (s *Stream) Next(pm bool) (*opencv.IplImage, error) {
 
 	old, err := s.getOldImage()
 	if err != nil {
@@ -92,15 +91,24 @@ func (s *Stream) Next() (*opencv.IplImage, error) {
 	}
 
 	if old == nil {
-		fmt.Println("old == nil")
+		glog.Info("old == nil")
 		return s.now_video.Next()
 	}
 
+	if !pm {
+		if s.now_value != SWITCH_VALUE {
+			s.now_value++
+		}
+	}
 	alpha := s.now_value / SWITCH_VALUE
-	next, _ := s.now_video.Next()
-	opencv.AddWeighted(next, float64(alpha), old, float64(1.0-alpha), 0.0, s.now_image)
 
-	fmt.Println("Next OK")
+	next, err := s.now_video.Next()
+	if err != nil {
+		glog.Error("Next video error", err)
+		return nil, err
+	}
+
+	opencv.AddWeighted(next, float64(alpha), old, float64(1.0-alpha), 0.0, s.now_image)
 
 	return s.now_image, nil
 
@@ -160,26 +168,6 @@ func (s *Stream) Effect(e pm.Event) error {
 		case pm.Down:
 		}
 	default:
-	}
-	return nil
-}
-
-func (s *Stream) EffectXbox(e xbox.Event) error {
-	if xbox.JudgeAxis(e, xbox.L2) {
-		val := e.Axes[xbox.L2]
-		if val > 15000 {
-			s.now_value--
-		}
-		s.now_value--
-		return nil
-	}
-	if xbox.JudgeAxis(e, xbox.R2) {
-		val := e.Axes[xbox.R2]
-		if val > 15000 {
-			s.now_value++
-		}
-		s.now_value++
-		return nil
 	}
 	return nil
 }

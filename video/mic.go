@@ -1,10 +1,12 @@
 package video
 
 import (
+	"math"
+
 	"github.com/gordonklaus/portaudio"
 	"github.com/ikascrew/go-opencv/opencv"
-	//"fmt"
-	//"time"
+
+	"github.com/ikascrew/ikascrew"
 )
 
 func init() {
@@ -20,7 +22,6 @@ type Microphone struct {
 	h       int
 }
 
-/*
 func NewMicrophone() (*Microphone, error) {
 
 	m := Microphone{
@@ -155,4 +156,3 @@ func (m *Microphone) Release() error {
 	m.dst.Release()
 	return nil
 }
-*/

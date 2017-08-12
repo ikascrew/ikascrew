@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/golang/glog"
+
 	"github.com/ikascrew/ikascrew/client"
 	"github.com/ikascrew/ikascrew/server"
 	"github.com/ikascrew/ikascrew/tool"
@@ -13,15 +15,15 @@ import (
 func main() {
 
 	flag.Parse()
-
 	args := flag.Args()
-	l := len(args)
 
+	l := len(args)
 	if l < 1 {
+		glog.Error("Error:Argument[init|server|client]")
+		os.Exit(1)
 	}
 
 	cmd := args[0]
-
 	var project string
 	if l >= 2 {
 		project = args[1]
@@ -44,14 +46,14 @@ func main() {
 	case "client":
 		err = client.Start()
 	default:
-		err = fmt.Errorf("Error:ikascrew command[init|server|client|test]")
+		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		glog.Error(err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Done!")
+	glog.Info("Done!")
 	os.Exit(0)
 }

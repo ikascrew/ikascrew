@@ -43,6 +43,7 @@ func (v *File) Next() (*opencv.IplImage, error) {
 
 	img := v.cap.QueryFrame()
 	if img == nil {
+		v.Set(0)
 		return nil, fmt.Errorf("Error:Image is nil")
 	}
 
