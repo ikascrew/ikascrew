@@ -32,7 +32,7 @@ func (ika *IkascrewClient) switchHandler(w http.ResponseWriter, r *http.Request)
 	name := r.FormValue("name")
 	t := r.FormValue("type")
 
-	err := ika.callSwitch(name, t)
+	err := ika.callEffect(name, t)
 	if err != nil {
 		fmt.Println(err)
 	}

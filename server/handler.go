@@ -71,3 +71,16 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 	rep.Success = true
 	return rep, nil
 }
+
+func (i *IkascrewServer) Switch(ctx context.Context, r *pb.SwitchRequest) (*pb.SwitchReply, error) {
+
+	rep := &pb.SwitchReply{
+		Success: false,
+	}
+
+	err := i.window.SetSwitch(r.Type)
+	if err == nil {
+		rep.Success = true
+	}
+	return rep, err
+}

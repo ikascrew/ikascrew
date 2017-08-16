@@ -39,8 +39,8 @@ func NewPusher() (p *pusher, err error) {
 	go func() {
 		driver.Main(func(s screen.Screen) {
 
-			width := 1536
-			height := 288
+			width := 1024
+			height := 144
 
 			opt := &screen.NewWindowOptions{
 				Title:  "ikascrew pusher",
@@ -83,28 +83,44 @@ func NewPusher() (p *pusher, err error) {
 
 func (p *pusher) get() string {
 
-	newres := make([]string, 0)
-	newtar := make([]image.Image, 0)
-
 	sz := len(p.resources)
-	if p.current < sz || p.current > sz-1 {
+	if p.current > sz-1 {
 		return ""
 	}
 
 	rtn := p.resources[p.current]
 
+	err := p.delete()
+	if err != nil {
+		glog.Error(err.Error())
+		return ""
+	}
+
+	return rtn
+}
+
+func (p *pusher) delete() error {
+
+	sz := len(p.resources)
+	if p.current > sz-1 {
+		return fmt.Errorf("Pusher Index Error")
+	}
+
+	newres := make([]string, 0)
+	newtar := make([]image.Image, 0)
 	for idx, elm := range p.resources {
 		if idx != p.current {
 			newres = append(newres, elm)
 			newtar = append(newtar, p.targets[idx])
 		}
 	}
-
 	p.resources = newres
 	p.targets = newtar
-
 	p.win.Send(paint.Event{})
-	return rtn
+
+	p.cursor = 0
+	p.win.Send(paint.Event{})
+	return nil
 }
 
 func (p *pusher) add(f string) error {
@@ -119,13 +135,14 @@ func (p *pusher) add(f string) error {
 	icon := strings.Replace(f, ".mp4", ".jpg", 1)
 
 	d := ikascrew.ProjectName()
-	file := d + "/.tmp/icon" + icon
+	file := d + "/.client/icon" + icon
 	img, err := p.load(file)
 	if err != nil {
 		return err
 	}
 	p.targets = append(p.targets, img)
 
+	p.cursor = 0
 	p.win.Send(paint.Event{})
 	return nil
 }
@@ -151,27 +168,27 @@ func (p *pusher) draw(m *image.RGBA) {
 	hix := b.Max.X
 	hiy := b.Max.Y
 
-	hor := p.cursor / 200
+	hor := p.cursor / 150
 	glog.Info("R[%d][%d]\n", p.cursor, hor)
 
 	white := color.RGBA{255, 255, 255, 255}
 	black := color.RGBA{0, 0, 0, 255}
 
-	start := (hor / 512)
+	start := (hor / 256)
 
 	for y := loy; y < hiy; y++ {
 		var img image.Image
 		for x := lox; x < hix; x++ {
 
-			d := x / 512
+			d := x / 256
 			idx := start + d
 
 			flag := false
-			if x >= 0 && x < 512 {
+			if x >= 0 && x < 256 {
 				p.current = idx
 				flag = true
-				if x > 5 && x < 507 {
-					if y > 5 && y < 284 {
+				if x > 5 && x < 251 {
+					if y > 5 && y < 140 {
 						flag = false
 					}
 				}
@@ -183,7 +200,7 @@ func (p *pusher) draw(m *image.RGBA) {
 				img = nil
 			}
 
-			dx := x - (d * 512)
+			dx := x - (d * 256)
 			go func(img image.Image, x, y, dx int, flag bool) {
 				if img == nil {
 					m.Set(x, y, black)

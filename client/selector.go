@@ -22,7 +22,7 @@ import (
 )
 
 const SELECTOR_WIDTH = 512
-const SELECTOR_HEIGHT = 500
+const SELECTOR_HEIGHT = 800
 
 const SELECTOR_IMAGE_W = 512
 const SELECTOR_IMAGE_H = 96
@@ -167,7 +167,7 @@ func (s *selector) draw(m *image.RGBA) {
 
 func (s *selector) initialize(p string) error {
 
-	work := p + "/.tmp/thumb"
+	work := p + "/.client/thumb"
 	paths, err := s.search(work)
 	if err != nil {
 		return err

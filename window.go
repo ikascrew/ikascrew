@@ -97,6 +97,10 @@ func (w *Window) Display(win *opencv.Window) error {
 	return nil
 }
 
+func (w *Window) SetSwitch(t string) error {
+	return w.stream.SetSwitch(t)
+}
+
 func (w *Window) Effect(e pm.Event) error {
 	return w.stream.Effect(e)
 }

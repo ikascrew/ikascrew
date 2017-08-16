@@ -20,6 +20,9 @@ type Stream struct {
 	release_video Video
 
 	used map[string]bool
+
+	nextFlag bool
+	prevFlag bool
 }
 
 const SWITCH_VALUE = 200
@@ -38,6 +41,9 @@ func NewStream() (*Stream, error) {
 
 	rtn.now_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
 	rtn.old_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
+
+	rtn.nextFlag = false
+	rtn.prevFlag = false
 
 	return &rtn, nil
 }
@@ -82,6 +88,26 @@ func (s *Stream) Get(pm bool) (*opencv.IplImage, error) {
 			s.now_value++
 		}
 	}
+	if s.nextFlag {
+		if s.now_value == SWITCH_VALUE {
+			s.nextFlag = false
+		} else if s.now_value < SWITCH_VALUE {
+			s.now_value++
+		} else {
+			s.now_value--
+		}
+	}
+
+	if s.prevFlag {
+		if s.now_value == 0 {
+			s.prevFlag = false
+		} else if s.now_value > 0 {
+			s.now_value--
+		} else {
+			s.now_value++
+		}
+	}
+
 	alpha := s.now_value / SWITCH_VALUE
 
 	next, err := s.now_video.Next()
@@ -93,7 +119,6 @@ func (s *Stream) Get(pm bool) (*opencv.IplImage, error) {
 	opencv.AddWeighted(next, float64(alpha), old, float64(1.0-alpha), 0.0, s.now_image)
 
 	return s.now_image, nil
-
 }
 
 func (s *Stream) getOldImage() (*opencv.IplImage, error) {
@@ -163,4 +188,15 @@ func (s *Stream) PrintVideos(line string) {
 	if s.release_video != nil {
 		glog.Info("[3]" + s.release_video.Source())
 	}
+}
+
+func (s *Stream) SetSwitch(t string) error {
+	if t == "next" {
+		s.nextFlag = true
+	} else if t == "prev" {
+		s.prevFlag = true
+	} else {
+		return fmt.Errorf("Unknown type[%s]", t)
+	}
+	return nil
 }

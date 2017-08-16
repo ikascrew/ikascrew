@@ -3,12 +3,11 @@ package tool
 import (
 	"fmt"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
-	"sort"
 	"strings"
 
 	"github.com/ikascrew/go-opencv/opencv"
+	"github.com/ikascrew/ikascrew"
 
 	"gopkg.in/cheggaaa/pb.v1"
 )
@@ -19,27 +18,43 @@ type Movie struct {
 	Image string
 }
 
-const TMP = ".tmp"
+const PUBLIC = ".public"
+const IMAGES = "images"
+
+const CLIENT = ".client"
 const THUMB = "thumb"
 const ICON = "icon"
 
+func GetPublicDir() string {
+	dir := ikascrew.ProjectName()
+	return dir + "/" + PUBLIC
+}
+
+func GetClientDir() string {
+	dir := ikascrew.ProjectName()
+	return dir + "/" + CLIENT
+}
+
 func CreateProject(dir string) error {
 
-	tmp := dir + "/" + TMP
-	thumb := tmp + "/" + THUMB
-	icon := tmp + "/" + ICON
-
-	err := os.MkdirAll(thumb, 0777)
+	err := ikascrew.Load(dir)
 	if err != nil {
-		return fmt.Errorf("Error make directory:%s", thumb)
+		return fmt.Errorf("Load Project:%v", err)
 	}
 
-	err = os.MkdirAll(icon, 0777)
+	public := GetPublicDir()
+	client := GetClientDir()
+
+	images := public + "/" + IMAGES
+	thumb := client + "/" + THUMB
+	icon := client + "/" + ICON
+
+	err = Mkdir([]string{thumb, icon, images})
 	if err != nil {
-		return fmt.Errorf("Error make directory:%s", icon)
+		return fmt.Errorf("Error make directory:%v", err)
 	}
 
-	files, err := search(dir)
+	files, err := Search(dir, []string{public, client})
 	if err != nil {
 		return fmt.Errorf("Error directory search:%s", err)
 	}
@@ -73,7 +88,7 @@ func CreateProject(dir string) error {
 
 			out = icon + work
 			mkIdx = strings.LastIndex(out, "/")
-			tmp = string(out[:mkIdx])
+			tmp := string(out[:mkIdx])
 			err = os.MkdirAll(tmp, 0777)
 
 			err = createIcon(f, out)
@@ -105,7 +120,6 @@ func CreateProject(dir string) error {
 			if err != nil {
 				return fmt.Errorf("Error Create Icon:%s", err)
 			}
-
 		}
 
 		movie.Name = string(work[1:])
@@ -134,42 +148,6 @@ func isImage(f string) bool {
 	return false
 }
 
-func search(d string) ([]string, error) {
-
-	fileInfos, err := ioutil.ReadDir(d)
-	if err != nil {
-		return nil, fmt.Errorf("Error:Read Dir[%s]", d)
-	}
-
-	rtn := make([]string, 0)
-	if strings.Index(d, TMP) != -1 {
-		return rtn, nil
-	}
-
-	for _, f := range fileInfos {
-		fname := f.Name()
-		if f.IsDir() {
-			files, err := search(d + "/" + fname)
-			if err != nil {
-				return nil, err
-			}
-			rtn = append(rtn, files...)
-		} else {
-			midx := strings.LastIndex(fname, ".mp4")
-			jidx := strings.LastIndex(fname, ".jpg")
-			pidx := strings.LastIndex(fname, ".png")
-			if midx == len(fname)-4 ||
-				jidx == len(fname)-4 ||
-				pidx == len(fname)-4 {
-				rtn = append(rtn, d+"/"+fname)
-			}
-		}
-	}
-
-	sort.Strings(rtn)
-	return rtn, nil
-}
-
 func createIcon(in, out string) error {
 
 	var ipl *opencv.IplImage
@@ -190,7 +168,7 @@ func createIcon(in, out string) error {
 	}
 
 	defer ipl.Release()
-	resize := opencv.Resize(ipl, 512, 288, opencv.CV_INTER_LINEAR)
+	resize := opencv.Resize(ipl, 256, 144, opencv.CV_INTER_LINEAR)
 	defer resize.Release()
 
 	img := resize.ToImage()
@@ -288,16 +266,6 @@ func createThumbnail(in, out string, cut int) error {
 	return nil
 }
 
-func copyFile(src, dst string) error {
-	// read the whole file at once
-	b, err := ioutil.ReadFile(src)
-	if err != nil {
-		return fmt.Errorf("Error:Read File %s", src)
-	}
-
-	err = ioutil.WriteFile(dst, b, 0644)
-	if err != nil {
-		return fmt.Errorf("Error:Write File %s", dst)
-	}
+func createPage() error {
 	return nil
 }

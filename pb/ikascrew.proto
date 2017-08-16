@@ -4,6 +4,7 @@ package pb;
 service Ikascrew {
   rpc Sync (SyncRequest) returns (SyncReply) {}
   rpc Effect (EffectRequest) returns (EffectReply) {}
+  rpc Switch (SwitchRequest) returns (SwitchReply) {}
 }
 
 message SyncRequest {
@@ -22,5 +23,13 @@ message EffectRequest {
 }
 
 message EffectReply {
+  bool success = 1;
+}
+
+message SwitchRequest {
+  string type = 2;
+}
+
+message SwitchReply {
   bool success = 1;
 }
