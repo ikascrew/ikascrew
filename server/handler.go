@@ -28,12 +28,10 @@ func (i *IkascrewServer) startRPC() error {
 	pb.RegisterIkascrewServer(s, i)
 
 	reflection.Register(s)
-	go func() {
-		if err := s.Serve(lis); err != nil {
-			fmt.Println("failed to serve: %v", err)
-			panic(err)
-		}
-	}()
+	if err := s.Serve(lis); err != nil {
+		fmt.Println("failed to serve: %v", err)
+		panic(err)
+	}
 	return nil
 }
 

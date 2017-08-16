@@ -3,11 +3,9 @@ package ikascrew
 import (
 	"fmt"
 
-	"github.com/ikascrew/go-opencv/opencv"
-
-	pm "github.com/ikascrew/powermate"
-
 	"github.com/golang/glog"
+	"github.com/ikascrew/go-opencv/opencv"
+	pm "github.com/ikascrew/powermate"
 )
 
 type Stream struct {
@@ -20,44 +18,42 @@ type Stream struct {
 	old_image *opencv.IplImage
 
 	release_video Video
+
+	used map[string]bool
 }
 
 const SWITCH_VALUE = 200
 
 func NewStream() (*Stream, error) {
+	rtn := Stream{}
 
-	s := Stream{}
+	rtn.now_value = 0
+	rtn.old_value = 0
 
-	s.now_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
-	s.old_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.now_video = nil
+	rtn.old_video = nil
+	rtn.release_video = nil
 
-	s.now_value = 0
-	s.old_value = 0
+	rtn.used = make(map[string]bool)
 
-	s.now_video = nil
-	s.old_video = nil
-	s.release_video = nil
+	rtn.now_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.old_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
 
-	used = make(map[string]bool)
-
-	return &s, nil
+	return &rtn, nil
 }
 
-var used map[string]bool
-
-func (s *Stream) Push(v Video) error {
-
-	if used[v.Source()] {
+func (s *Stream) Switch(v Video) error {
+	if s.used[v.Source()] {
 		return fmt.Errorf("until used video")
 	}
-	used[v.Source()] = true
+	s.used[v.Source()] = true
 
 	s.old_value = s.now_value
 	s.now_value = 0
 
 	wk := s.release_video
 	if wk != nil {
-		delete(used, wk.Source())
+		delete(s.used, wk.Source())
 		defer wk.Release()
 	}
 
@@ -68,25 +64,11 @@ func (s *Stream) Push(v Video) error {
 	return nil
 }
 
-func (s *Stream) PrintVideos(line string) {
-	glog.Info(line + "-------------------------------------------------")
-	if s.now_video != nil {
-		glog.Info("[1]" + s.now_video.Source())
-	}
-
-	if s.old_video != nil {
-		glog.Info("[2]" + s.old_video.Source())
-	}
-
-	if s.release_video != nil {
-		glog.Info("[3]" + s.release_video.Source())
-	}
-}
-
-func (s *Stream) Next(pm bool) (*opencv.IplImage, error) {
+func (s *Stream) Get(pm bool) (*opencv.IplImage, error) {
 
 	old, err := s.getOldImage()
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -123,13 +105,6 @@ func (s *Stream) getOldImage() (*opencv.IplImage, error) {
 		return nil, nil
 	}
 
-	//完全に切り替える方向に持っていく
-	//if s.old_value > SWITCH_VALUE {
-	//s.old_value--
-	//} else if s.old_value < SWITCH_VALUE {
-	//s.old_value++
-	//}
-
 	alpha := s.old_value / SWITCH_VALUE
 
 	next, _ := s.old_video.Next()
@@ -137,20 +112,23 @@ func (s *Stream) getOldImage() (*opencv.IplImage, error) {
 
 	opencv.AddWeighted(next, float64(alpha), now, float64(1.0-alpha), 0.0, s.old_image)
 
-	//if s.old_value == SWITCH_VALUE {
-	//s.release_video.Release()
-	//s.release_video = nil
-	//}
 	return s.old_image, nil
 }
 
-func (s *Stream) Wait() int {
-	return s.now_video.Wait()
-}
+func (s *Stream) Release() {
 
-func (s *Stream) Release() error {
-	//Stream のリリースは終了時のみ行う
-	return nil
+	s.now_image.Release()
+	s.old_image.Release()
+
+	if s.now_video != nil {
+		s.now_video.Release()
+	}
+	if s.old_video != nil {
+		s.old_video.Release()
+	}
+	if s.release_video != nil {
+		s.release_video.Release()
+	}
 }
 
 func (s *Stream) Effect(e pm.Event) error {
@@ -170,4 +148,19 @@ func (s *Stream) Effect(e pm.Event) error {
 	default:
 	}
 	return nil
+}
+
+func (s *Stream) PrintVideos(line string) {
+	glog.Info(line + "-------------------------------------------------")
+	if s.now_video != nil {
+		glog.Info("[1]" + s.now_video.Source())
+	}
+
+	if s.old_video != nil {
+		glog.Info("[2]" + s.old_video.Source())
+	}
+
+	if s.release_video != nil {
+		glog.Info("[3]" + s.release_video.Source())
+	}
 }

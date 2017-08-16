@@ -18,6 +18,7 @@ func main() {
 	args := flag.Args()
 
 	l := len(args)
+	fmt.Println(args)
 	if l < 1 {
 		glog.Error("Error:Argument[init|server|client]")
 		os.Exit(1)

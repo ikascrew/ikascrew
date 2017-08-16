@@ -2,9 +2,11 @@ package client
 
 import (
 	"fmt"
-	"github.com/ikascrew/ikascrew"
 	"os"
 	"strings"
+
+	"github.com/golang/glog"
+	"github.com/ikascrew/ikascrew"
 
 	"golang.org/x/exp/shiny/driver"
 	"golang.org/x/exp/shiny/screen"
@@ -16,10 +18,6 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-
-	_ "golang.org/x/image/bmp"
-	_ "golang.org/x/image/tiff"
-	_ "golang.org/x/image/webp"
 )
 
 type pusher struct {
@@ -88,6 +86,11 @@ func (p *pusher) get() string {
 	newres := make([]string, 0)
 	newtar := make([]image.Image, 0)
 
+	sz := len(p.resources)
+	if p.current < sz || p.current > sz-1 {
+		return ""
+	}
+
 	rtn := p.resources[p.current]
 
 	for idx, elm := range p.resources {
@@ -101,12 +104,16 @@ func (p *pusher) get() string {
 	p.targets = newtar
 
 	p.win.Send(paint.Event{})
-
 	return rtn
 }
 
 func (p *pusher) add(f string) error {
 
+	for _, elm := range p.resources {
+		if f == elm {
+			return fmt.Errorf("Resource[" + f + "] exist")
+		}
+	}
 	p.resources = append(p.resources, f)
 
 	icon := strings.Replace(f, ".mp4", ".jpg", 1)
@@ -145,8 +152,7 @@ func (p *pusher) draw(m *image.RGBA) {
 	hiy := b.Max.Y
 
 	hor := p.cursor / 200
-
-	fmt.Printf("R[%d][%d]\n", p.cursor, hor)
+	glog.Info("R[%d][%d]\n", p.cursor, hor)
 
 	white := color.RGBA{255, 255, 255, 255}
 	black := color.RGBA{0, 0, 0, 255}

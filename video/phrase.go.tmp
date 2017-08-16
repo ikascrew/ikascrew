@@ -111,10 +111,6 @@ func (p *Phrase) Next() (*opencv.IplImage, error) {
 	return p.dst, nil
 }
 
-func (v *Phrase) Wait() int {
-	return 33
-}
-
 func (v *Phrase) Set(f int) {
 	v.current = f
 }

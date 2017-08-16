@@ -128,10 +128,6 @@ func (m *Microphone) Next() (*opencv.IplImage, error) {
 	return m.dst, nil
 }
 
-func (v *Microphone) Wait() int {
-	return 33
-}
-
 func (v *Microphone) Set(f int) {
 	v.current = f
 }

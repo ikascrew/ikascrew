@@ -2,44 +2,40 @@ package ikascrew
 
 import (
 	"fmt"
+	"runtime"
 	"sync"
-
-	"github.com/ikascrew/go-opencv/opencv"
-	pm "github.com/ikascrew/powermate"
+	"time"
 
 	"github.com/golang/glog"
+	"github.com/ikascrew/go-opencv/opencv"
+	pm "github.com/ikascrew/powermate"
 )
 
 func init() {
 }
 
 type Window struct {
-	stream *Stream
-	window *opencv.Window
+	name string
+	wait chan Video
 
-	m         *sync.Mutex
-	wait      chan Video
+	stream *Stream
+
 	PowerMate bool
 }
 
 func NewWindow(name string) (*Window, error) {
-	var err error
-	rtn := &Window{}
-	win := opencv.NewWindow(name)
-	rtn.window = win
-	rtn.stream, err = NewStream()
-	if err != nil {
-		return nil, err
-	}
 
-	rtn.m = new(sync.Mutex)
+	rtn := &Window{}
+
+	rtn.name = name
 	rtn.wait = make(chan Video)
 
-	return rtn, nil
+	var err error
+	rtn.stream, err = NewStream()
+	return rtn, err
 }
 
 func (w *Window) Push(v Video) error {
-
 	w.stream.PrintVideos("Push Start")
 	w.wait <- v
 	w.stream.PrintVideos("Push End")
@@ -48,44 +44,57 @@ func (w *Window) Push(v Video) error {
 
 func (w *Window) Play(v Video) error {
 
-	err := w.stream.Push(v)
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	opencv.StartWindowThread()
+	win := opencv.NewWindow(w.name)
+	defer win.Destroy()
+
+	err := w.stream.Switch(v)
 	if err != nil {
 		return err
 	}
 
 	for {
-		//w.m.Lock()
 		glog.Info("Main Loop")
 		select {
 		case v := <-w.wait:
-			err := w.stream.Push(v)
+			err := w.stream.Switch(v)
 			if err != nil {
 				glog.Error("Stream Push Error:", err)
-				//TODO もう一回回るようにする
 			}
 		default:
-			img, err := w.stream.Next(w.PowerMate)
+			err := w.Display(win)
 			if err != nil {
-				glog.Error("Stream Next Error:", err)
-			}
-
-			if img != nil {
-				fmt.Println("ShowImage")
-				w.window.ShowImage(img)
-				if err != nil {
-					glog.Error("Window ShowImage Error:", err)
-				}
-				fmt.Printf("Wait(%d)\n", w.stream.Wait())
-				opencv.WaitKey(w.stream.Wait())
-			} else {
-				glog.Error("Next Image nil")
+				glog.Error("Window Display Error:", err)
 			}
 		}
 		glog.Info("Main Loop End")
-		//w.m.Unlock()
 	}
 
 	return fmt.Errorf("Error : Stream is nil")
+}
+
+func (w *Window) Display(win *opencv.Window) error {
+
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go func() {
+		//fps 30
+		time.Sleep(33 * time.Millisecond)
+		wg.Done()
+	}()
+
+	img, err := w.stream.Get(w.PowerMate)
+	if err != nil {
+		return err
+	}
+
+	win.ShowImage(img)
+	wg.Wait()
+
+	return nil
 }
 
 func (w *Window) Effect(e pm.Event) error {
@@ -94,7 +103,6 @@ func (w *Window) Effect(e pm.Event) error {
 
 func (w *Window) Destroy() {
 	w.stream.Release()
-	w.window.Destroy()
 }
 
 func (w *Window) FullScreen() {

@@ -10,9 +10,7 @@ func init() {
 }
 
 type File struct {
-	fps    int
 	frames int
-	pos    int
 	name   string
 
 	cap *opencv.Capture
@@ -29,7 +27,6 @@ func NewFile(file string) (*File, error) {
 		return nil, fmt.Errorf("New Capture Error:[%s]", f)
 	}
 
-	f.fps = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FPS))
 	f.frames = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
 
 	return &f, nil
@@ -41,34 +38,26 @@ func (v *File) Next() (*opencv.IplImage, error) {
 		return nil, fmt.Errorf("Error:Caputure is nil")
 	}
 
-	img := v.cap.QueryFrame()
-	if img == nil {
-		v.Set(0)
-		return nil, fmt.Errorf("Error:Image is nil")
+	pos := int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
+	if pos == v.Size() {
+		v.Set(1)
 	}
 
-	v.pos = int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
-	if v.pos == v.Size() {
-		v.Set(0)
+	img := v.cap.QueryFrame()
+	if img == nil {
+		v.Set(1)
+		return nil, fmt.Errorf("Error:Image is nil")
 	}
 
 	return img, nil
 }
 
-func (v *File) Wait() int {
-	return 1000 / v.fps
-}
-
 func (v *File) Set(f int) {
-	if f > v.frames {
-		f = f % v.frames
-	}
 	v.cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(f))
-	v.pos = f
 }
 
 func (v *File) Current() int {
-	return v.pos
+	return int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
 }
 
 func (v *File) Size() int {

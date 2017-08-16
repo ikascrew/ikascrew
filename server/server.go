@@ -39,7 +39,7 @@ func Start(d string) error {
 	glog.Info("Set max procs")
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	err = ikascrew.Loading(d)
+	err = ikascrew.Load(d)
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}
@@ -73,7 +73,9 @@ func Start(d string) error {
 	}()
 
 	glog.Info("Start RPC")
-	ika.startRPC()
+	go func() {
+		ika.startRPC()
+	}()
 
 	glog.Info("Let's Play!")
 	return win.Play(v)

@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/golang/glog"
+
 	"golang.org/x/exp/shiny/driver"
 	"golang.org/x/exp/shiny/screen"
 	"golang.org/x/mobile/event/lifecycle"
@@ -17,14 +19,10 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-
-	_ "golang.org/x/image/bmp"
-	_ "golang.org/x/image/tiff"
-	_ "golang.org/x/image/webp"
 )
 
 const SELECTOR_WIDTH = 512
-const SELECTOR_HEIGHT = 1000
+const SELECTOR_HEIGHT = 500
 
 const SELECTOR_IMAGE_W = 512
 const SELECTOR_IMAGE_H = 96
@@ -113,7 +111,7 @@ func (s *selector) draw(m *image.RGBA) {
 
 	ver := s.cursor / 1000
 
-	fmt.Printf("L[%d][%d]\n", s.cursor, ver)
+	glog.Info("L[%d][%d]\n", s.cursor, ver)
 	white := color.RGBA{255, 255, 255, 255}
 	black := color.RGBA{0, 0, 0, 255}
 
@@ -135,7 +133,7 @@ func (s *selector) draw(m *image.RGBA) {
 		flag := false
 		yflag := false
 
-		if (y+48) > 528 && (y-48) < 528 {
+		if (y+48) > 240 && (y-48) < 240 {
 			s.current = idx
 			if dy <= 5 || dy >= 91 {
 				flag = true

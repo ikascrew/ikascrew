@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ikascrew/ikascrew"
@@ -19,9 +20,11 @@ func (ika *IkascrewClient) startHTTP() {
 	http.HandleFunc("/switch", ika.switchHandler)
 	http.Handle("/", http.FileServer(http.Dir(ikascrew.ProjectName()+"/.public/")))
 
-	go func() {
-		http.ListenAndServe(":5555", nil)
-	}()
+	err := http.ListenAndServe(":5555", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
 }
 
 func (ika *IkascrewClient) switchHandler(w http.ResponseWriter, r *http.Request) {

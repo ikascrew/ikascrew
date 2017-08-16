@@ -6,7 +6,6 @@ import (
 
 type Video interface {
 	Next() (*opencv.IplImage, error)
-	Wait() int
 	Set(int)
 
 	Current() int

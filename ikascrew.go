@@ -20,14 +20,14 @@ func ProjectName() string {
 	return project
 }
 
-func Loading(name string) error {
+func Load(name string) error {
 
 	glog.Info("Loading Project[" + name + "]")
 
 	project = name
 	conf, err := config.Load(project)
 	if err != nil {
-		return fmt.Errorf("Error Config[%v]", err)
+		return fmt.Errorf("Error LoadConfig[%v]", err)
 	}
 	Config = conf
 	return nil

@@ -20,7 +20,8 @@ func NewImage(f string) (*Image, error) {
 		name:    f,
 		current: 0,
 	}
-	img.bg = opencv.LoadImage(f)
+	wk := opencv.LoadImage(f)
+	img.bg = wk.Clone()
 	if img.bg == nil {
 		return nil, fmt.Errorf("Error:LoadImage[%s]", f)
 	}
@@ -34,10 +35,6 @@ func (v *Image) Next() (*opencv.IplImage, error) {
 		v.current = 0
 	}
 	return v.bg, nil
-}
-
-func (v *Image) Wait() int {
-	return 33
 }
 
 func (v *Image) Set(f int) {
