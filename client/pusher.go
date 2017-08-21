@@ -168,7 +168,7 @@ func (p *pusher) draw(m *image.RGBA) {
 	hix := b.Max.X
 	hiy := b.Max.Y
 
-	hor := p.cursor / 150
+	hor := p.cursor / 175
 	glog.Info("R[%d][%d]\n", p.cursor, hor)
 
 	white := color.RGBA{255, 255, 255, 255}

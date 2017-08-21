@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/ikascrew/ikascrew"
@@ -64,7 +65,7 @@ func Start() error {
 	err = xbox.Listen(0)
 	if err != nil {
 		glog.Error("Xbox Listen Error[" + err.Error() + "]")
-		ika.startHTTP()
+		return err
 	}
 	return err
 }
@@ -78,11 +79,13 @@ var R2 bool
 func (ika *IkascrewClient) controller(e xbox.Event) error {
 
 	if xbox.JudgeAxis(e, xbox.JOY_L_VERTICAL) {
+		fmt.Println("JOY L")
 		ika.selector.setCursor(e.Axes[xbox.JOY_L_VERTICAL])
 		ika.selector.win.Send(paint.Event{})
 	}
 
 	if xbox.JudgeAxis(e, xbox.JOY_R_HORIZONTAL) {
+		fmt.Println("JOY R")
 		ika.pusher.setCursor(e.Axes[xbox.JOY_R_HORIZONTAL])
 		ika.pusher.win.Send(paint.Event{})
 	}
