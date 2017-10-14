@@ -17,9 +17,11 @@ func Search(d string, ignore []string) ([]string, error) {
 
 	rtn := make([]string, 0)
 
-	for _, ig := range ignore {
-		if strings.Index(d, ig) != -1 {
-			return rtn, nil
+	if ignore != nil {
+		for _, ig := range ignore {
+			if strings.Index(d, ig) != -1 {
+				return rtn, nil
+			}
 		}
 	}
 
