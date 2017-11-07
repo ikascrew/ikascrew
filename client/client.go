@@ -8,9 +8,6 @@ import (
 	"github.com/google/gops/agent"
 
 	"golang.org/x/mobile/event/key"
-	"golang.org/x/mobile/event/paint"
-
-	"image"
 )
 
 func init() {
@@ -57,13 +54,14 @@ func Start() error {
 	ika.selector = win
 
 	for {
+
 		e := win.window.NextEvent()
+
 		switch e := e.(type) {
 		case key.Event:
-			win.keyListener(int(e.Code))
-		case paint.Event:
-			win.window.Upload(image.Point{}, win.buffer, win.buffer.Bounds())
-			win.window.Publish()
+			//win.keyListener(int(e.Code))
+		case *Part:
+			e.Redraw()
 		}
 	}
 	return err

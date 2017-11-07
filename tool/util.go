@@ -6,6 +6,9 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"image"
+	_ "image/jpeg"
 )
 
 func Search(d string, ignore []string) ([]string, error) {
@@ -70,4 +73,17 @@ func Mkdir(dirs []string) error {
 		}
 	}
 	return nil
+}
+
+func LoadImage(f string) (image.Image, error) {
+	d, err := os.Open(f)
+	if err != nil {
+		return nil, err
+	}
+	defer d.Close()
+	m, _, err := image.Decode(d)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode %s: %v", f, err)
+	}
+	return m, nil
 }
