@@ -51,7 +51,6 @@ func (n *Next) Draw() {
 	black := color.RGBA{0, 0, 0, 255}
 
 	start := (hor / 256)
-
 	for y := loy; y < hiy; y++ {
 		var img image.Image
 		for x := lox; x < hix; x++ {
@@ -103,11 +102,11 @@ func (n *Next) get() string {
 		glog.Error(err.Error())
 		return ""
 	}
-
 	return rtn
 }
 
 func (n *Next) delete() error {
+
 	sz := len(n.resource)
 	if n.idx > sz-1 {
 		return fmt.Errorf("Pusher Index Error")
@@ -125,7 +124,6 @@ func (n *Next) delete() error {
 	n.targets = newtar
 
 	n.cursor = 0
-
 	n.Draw()
 
 	return nil

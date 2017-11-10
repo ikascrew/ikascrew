@@ -1,6 +1,8 @@
 package client
 
 import (
+	"fmt"
+
 	"golang.org/x/exp/shiny/driver"
 	"golang.org/x/exp/shiny/screen"
 )
@@ -8,20 +10,9 @@ import (
 type Window struct {
 	window screen.Window
 
-	list *List
-	next *Next
-
-	/*
-		cursorS   int
-		currentS  int
-		images    []image.Image
-		resourceS []string
-
-		cursorP   int
-		currentP  int
-		targets   []image.Image
-		resourceP []string
-	*/
+	list   *List
+	next   *Next
+	player *Player
 }
 
 func NewWindow(t string, w, h int) (window *Window, err error) {
@@ -36,17 +27,11 @@ func NewWindow(t string, w, h int) (window *Window, err error) {
 			Width:  w,
 			Height: h,
 		}
+
 		window.window, err = s.NewWindow(opt)
 		if err != nil {
 			return
 		}
-		/*
-			winSize := image.Point{w, h}
-			window.buffer, err = s.NewBuffer(winSize)
-			if err != nil {
-				return
-			}
-		*/
 
 		l, err := NewList(window.window, s)
 		if err != nil {
@@ -58,8 +43,14 @@ func NewWindow(t string, w, h int) (window *Window, err error) {
 			return
 		}
 
+		p, err := NewPlayer(window.window, s)
+		if err != nil {
+			return
+		}
+
 		window.list = l
 		window.next = n
+		window.player = p
 
 	})
 
@@ -68,26 +59,40 @@ func NewWindow(t string, w, h int) (window *Window, err error) {
 
 func (w *Window) Release() {
 	w.window.Release()
-	//w.buffer.Release()
+	w.list.Release()
+	w.next.Release()
+	w.player.Release()
 }
 
-/*
 func (w *Window) keyListener(k int) {
-
-	fmt.Printf("[%d]\n", k)
 
 	switch k {
 	case 82:
-		w.list.setCursor(-60000)
-		w.Repaint()
+		w.list.setCursor(-10000)
+		w.list.Push()
 	case 81:
-		w.setCursorS(60000)
-		w.Repaint()
+		w.list.setCursor(10000)
+		w.list.Push()
 	case 80:
-		w.setCursorP(10000)
+		w.next.setCursor(-20000)
+		w.next.Push()
 	case 79:
-		w.setCursorP(-10000)
+		w.next.setCursor(20000)
+		w.next.Push()
 	case 40:
+		res := w.list.get()
+		if res != "" {
+			err := w.next.add(res)
+			if err != nil {
+				// TODO 無視
+			}
+			w.next.Push()
+
+			w.player.setFile(res)
+			w.player.Push()
+		}
+	case 44:
+	default:
+		fmt.Printf("Not Defined[%d]\n", k)
 	}
 }
-*/

@@ -59,7 +59,7 @@ func Start() error {
 
 		switch e := e.(type) {
 		case key.Event:
-			//win.keyListener(int(e.Code))
+			win.keyListener(int(e.Code))
 		case *Part:
 			e.Redraw()
 		}

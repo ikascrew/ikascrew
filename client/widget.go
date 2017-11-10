@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"image"
 
 	"golang.org/x/exp/shiny/screen"
@@ -40,9 +39,6 @@ func (p *Part) Push() {
 }
 
 func (p *Part) Redraw() {
-
-	fmt.Println("Redraw()")
-
 	p.owner.Upload(p.rect.Min, p.buffer, p.buffer.Bounds())
 	p.owner.Publish()
 }

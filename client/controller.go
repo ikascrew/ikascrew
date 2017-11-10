@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"github.com/ikascrew/xbox"
 
 	"github.com/golang/glog"
@@ -16,13 +15,11 @@ var R2 bool
 func (ika *IkascrewClient) controller(e xbox.Event) error {
 
 	if xbox.JudgeAxis(e, xbox.JOY_L_VERTICAL) {
-		fmt.Println("JOY L")
 		ika.selector.list.setCursor(e.Axes[xbox.JOY_L_VERTICAL])
 		ika.selector.list.Push()
 	}
 
 	if xbox.JudgeAxis(e, xbox.JOY_R_HORIZONTAL) {
-		fmt.Println("JOY R")
 		ika.selector.next.setCursor(e.Axes[xbox.JOY_R_HORIZONTAL])
 		ika.selector.next.Push()
 	}
@@ -49,7 +46,6 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 
 	if e.Buttons[xbox.X] && X {
 		X = false
-
 		res := ika.selector.next.get()
 		if res != "" {
 			err := ika.callEffect(res, "file")
@@ -86,14 +82,12 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 
 	if e.Buttons[xbox.B] && B {
 		B = false
-
 		err := ika.selector.next.delete()
 		if err != nil {
 			// TODO 無視
 			glog.Error("Pusher Delete Error:", err)
 		}
 		ika.selector.next.Push()
-
 	} else if !e.Buttons[xbox.B] {
 		B = true
 	}

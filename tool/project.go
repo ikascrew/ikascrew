@@ -49,6 +49,10 @@ func CreateProject(dir string) error {
 	thumb := client + "/" + THUMB
 	icon := client + "/" + ICON
 
+	os.RemoveAll(images)
+	os.RemoveAll(thumb)
+	os.RemoveAll(icon)
+
 	err = Mkdir([]string{thumb, icon, images})
 	if err != nil {
 		return fmt.Errorf("Error make directory:%v", err)
