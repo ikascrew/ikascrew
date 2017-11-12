@@ -24,7 +24,7 @@ func Address() string {
 }
 
 type IkascrewServer struct {
-	window *ikascrew.Window
+	window *Window
 }
 
 func Start(d string) error {
@@ -52,7 +52,7 @@ func Start(d string) error {
 	}
 
 	glog.Info("Create main window")
-	win, err := ikascrew.NewWindow("ikascrew")
+	win, err := NewWindow("ikascrew")
 	if err != nil {
 		return fmt.Errorf("Error:Create New Window[%v]", err)
 	}

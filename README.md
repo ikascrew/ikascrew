@@ -1,8 +1,20 @@
 # ikascrew is Linux VJ System
 
+
+
+
+
+
+
+## System Requirements
+
+CPU:Intel core i7
+RAM:4GB
+
+## Use Hardware
+
 use powermate
 use xbox controller
-
 
 ## Install
 

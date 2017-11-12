@@ -1,31 +1,48 @@
-package ikascrew
+package server
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/ikascrew/go-opencv/opencv"
+
+	"github.com/ikascrew/ikascrew"
 	pm "github.com/ikascrew/powermate"
 )
 
 type Stream struct {
-	now_video Video
+	now_video ikascrew.Video
 	now_value float64
 	now_image *opencv.IplImage
 
-	old_video Video
+	old_video ikascrew.Video
 	old_value float64
 	old_image *opencv.IplImage
 
-	release_video Video
+	release_video ikascrew.Video
 
 	used map[string]bool
 
 	nextFlag bool
 	prevFlag bool
+
+	light       float64
+	empty_image *opencv.IplImage
+	real_image  *opencv.IplImage
+
+	wait int64
+
+	mode int
 }
 
 const SWITCH_VALUE = 200
+
+const (
+	SWITCH = 1
+	LIGHT  = 2
+	WAIT   = 3
+)
 
 func NewStream() (*Stream, error) {
 	rtn := Stream{}
@@ -39,16 +56,22 @@ func NewStream() (*Stream, error) {
 
 	rtn.used = make(map[string]bool)
 
-	rtn.now_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
-	rtn.old_image = opencv.CreateImage(Config.Width, Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.now_image = opencv.CreateImage(ikascrew.Config.Width, ikascrew.Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.old_image = opencv.CreateImage(ikascrew.Config.Width, ikascrew.Config.Height, opencv.IPL_DEPTH_8U, 3)
 
 	rtn.nextFlag = false
 	rtn.prevFlag = false
 
+	rtn.empty_image = opencv.CreateImage(ikascrew.Config.Width, ikascrew.Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.real_image = opencv.CreateImage(ikascrew.Config.Width, ikascrew.Config.Height, opencv.IPL_DEPTH_8U, 3)
+	rtn.light = 0
+
+	rtn.wait = 33
+	rtn.mode = SWITCH
 	return &rtn, nil
 }
 
-func (s *Stream) Switch(v Video) error {
+func (s *Stream) Switch(v ikascrew.Video) error {
 	if s.used[v.Source()] {
 		return fmt.Errorf("until used video")
 	}
@@ -68,6 +91,14 @@ func (s *Stream) Switch(v Video) error {
 	s.now_video = v
 
 	return nil
+}
+
+func (s *Stream) Add(org *opencv.IplImage) *opencv.IplImage {
+
+	alpha := s.light / 200
+	//opencv.AddWeighted(next, float64(alpha), old, float64(1.0-alpha), 0.0, s.now_image)
+	opencv.AddWeighted(s.empty_image, float64(alpha), org, float64(1.0-alpha), 0.0, s.real_image)
+	return s.real_image
 }
 
 func (s *Stream) Get(pm bool) (*opencv.IplImage, error) {
@@ -156,21 +187,71 @@ func (s *Stream) Release() {
 	}
 }
 
+func (s *Stream) Wait() time.Duration {
+	return time.Duration(s.wait)
+}
+
 func (s *Stream) Effect(e pm.Event) error {
 	switch e.Type {
-	case pm.Rotation:
-		switch e.Value {
-		case pm.Left:
-			s.now_value--
-		case pm.Right:
-			s.now_value++
-		}
+	/*
+		case pm.Rotation:
+			switch e.Value {
+			case pm.Left:
+				s.now_value--
+			case pm.Right:
+				s.now_value++
+			}
+	*/
 	case pm.Press:
 		switch e.Value {
 		case pm.Up:
+			fmt.Println("Up")
 		case pm.Down:
+			if s.mode == SWITCH {
+				s.mode = LIGHT
+				fmt.Println("Light Mode")
+			} else if s.mode == LIGHT {
+				s.mode = WAIT
+				fmt.Println("Wait Mode")
+			} else {
+				s.mode = SWITCH
+				fmt.Println("Switch Mode")
+			}
 		}
 	default:
+	}
+
+	switch s.mode {
+	case LIGHT:
+		switch e.Type {
+		case pm.Rotation:
+			switch e.Value {
+			case pm.Left:
+				s.light--
+			case pm.Right:
+				s.light++
+			}
+		}
+	case SWITCH:
+		switch e.Type {
+		case pm.Rotation:
+			switch e.Value {
+			case pm.Left:
+				s.now_value--
+			case pm.Right:
+				s.now_value++
+			}
+		}
+	case WAIT:
+		switch e.Type {
+		case pm.Rotation:
+			switch e.Value {
+			case pm.Left:
+				s.wait--
+			case pm.Right:
+				s.wait++
+			}
+		}
 	}
 	return nil
 }

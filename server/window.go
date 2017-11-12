@@ -1,4 +1,4 @@
-package ikascrew
+package server
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/ikascrew/go-opencv/opencv"
+
+	"github.com/ikascrew/ikascrew"
 	pm "github.com/ikascrew/powermate"
 )
 
@@ -16,7 +18,7 @@ func init() {
 
 type Window struct {
 	name string
-	wait chan Video
+	wait chan ikascrew.Video
 
 	stream *Stream
 
@@ -28,21 +30,21 @@ func NewWindow(name string) (*Window, error) {
 	rtn := &Window{}
 
 	rtn.name = name
-	rtn.wait = make(chan Video)
+	rtn.wait = make(chan ikascrew.Video)
 
 	var err error
 	rtn.stream, err = NewStream()
 	return rtn, err
 }
 
-func (w *Window) Push(v Video) error {
+func (w *Window) Push(v ikascrew.Video) error {
 	w.stream.PrintVideos("Push Start")
 	w.wait <- v
 	w.stream.PrintVideos("Push End")
 	return nil
 }
 
-func (w *Window) Play(v Video) error {
+func (w *Window) Play(v ikascrew.Video) error {
 
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
@@ -82,7 +84,7 @@ func (w *Window) Display(win *opencv.Window) error {
 	wg.Add(1)
 	go func() {
 		//fps 30
-		time.Sleep(33 * time.Millisecond)
+		time.Sleep(w.stream.Wait() * time.Millisecond)
 		wg.Done()
 	}()
 
@@ -90,8 +92,8 @@ func (w *Window) Display(win *opencv.Window) error {
 	if err != nil {
 		return err
 	}
+	win.ShowImage(w.stream.Add(img))
 
-	win.ShowImage(img)
 	wg.Wait()
 
 	return nil
