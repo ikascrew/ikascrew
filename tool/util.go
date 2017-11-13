@@ -9,6 +9,9 @@ import (
 
 	"image"
 	_ "image/jpeg"
+	_ "image/png"
+
+	"github.com/ikascrew/go-opencv/opencv"
 )
 
 func Search(d string, ignore []string) ([]string, error) {
@@ -86,4 +89,46 @@ func LoadImage(f string) (image.Image, error) {
 		return nil, fmt.Errorf("could not decode %s: %v", f, err)
 	}
 	return m, nil
+}
+
+func CreateMovie(f string) error {
+
+	// exist file
+	_, err := os.Stat(f)
+	if err != nil {
+		return err
+	}
+
+	//Change name
+	idx := strings.LastIndex(f, ".")
+	if idx == -1 {
+		return fmt.Errorf("Error Unknown ext[%s]", f)
+	}
+
+	mp4 := string(f[:idx]) + ".mp4"
+	_, err = os.Stat(mp4)
+	if err == nil {
+		return fmt.Errorf("Error [%s] is exist", mp4)
+	}
+
+	ipl := opencv.LoadImage(f)
+	if ipl == nil {
+		return fmt.Errorf("Error LoadImage[%s]", f)
+	}
+	defer ipl.Release()
+
+	//mp4
+	//fourcc := opencv.FOURCC('M', 'P', '4', '3')
+	//fourcc := opencv.FOURCC('M', 'P', '4', '2')
+	fourcc := opencv.FOURCC('X', '2', '6', '4')
+	fps := 30
+	w := opencv.NewVideoWriter(mp4, int(fourcc), float32(fps), ipl.Width(), ipl.Height(), 1)
+	for i := 0; i < fps; i++ {
+		w.WriteFrame(ipl.Clone())
+	}
+	w.Release()
+
+	fmt.Printf("Output movie[%s]\n", mp4)
+
+	return nil
 }

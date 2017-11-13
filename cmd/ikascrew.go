@@ -12,6 +12,8 @@ import (
 	"github.com/ikascrew/ikascrew/tool"
 )
 
+const VERSION = "0.0.0"
+
 func main() {
 
 	flag.Parse()
@@ -20,7 +22,7 @@ func main() {
 	l := len(args)
 	fmt.Println(args)
 	if l < 1 {
-		glog.Error("Error:Argument[init|server|client]")
+		glog.Error("Error:Argument[init|server|client|version|tool]")
 		os.Exit(1)
 	}
 
@@ -46,6 +48,15 @@ func main() {
 		}
 	case "client":
 		err = client.Start()
+	case "tool":
+		if project == "" {
+			err = fmt.Errorf("Required:FileName")
+		} else {
+			err = tool.CreateMovie(project)
+		}
+
+	case "version":
+		fmt.Println("ikascrew " + VERSION)
 	default:
 		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
 	}
