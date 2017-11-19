@@ -223,6 +223,7 @@ func (s *Stream) Effect(e pm.Event) error {
 
 	switch s.mode {
 	case LIGHT:
+		fmt.Printf("Light[%d]\n", s.light)
 		switch e.Type {
 		case pm.Rotation:
 			switch e.Value {
@@ -243,6 +244,7 @@ func (s *Stream) Effect(e pm.Event) error {
 			}
 		}
 	case WAIT:
+		fmt.Printf("Wait[%d]\n", s.wait)
 		switch e.Type {
 		case pm.Rotation:
 			switch e.Value {

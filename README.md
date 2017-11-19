@@ -1,24 +1,20 @@
-# ikascrew is Linux VJ System
+"ikascrew" is a software designed to make VJ easy with PC.
+VJ can be done just by preparing the personal computer and MP4.
+You can also simplify the operation by preparing "Joy Stick" and "Powermate".
 
+Currently it only supports Linux, but I hope to support Windows and Mac in the future as well.
 
-
-
-
-
-
-## System Requirements
+# System Requirements
 
 CPU:Intel core i7
 RAM:4GB
 
-## Use Hardware
 
-use powermate
-use xbox controller
+# Install
 
-## Install
+install opencv
 
-go install github.com/secondarykey/ikascrew/cmd
+https://github.com/ikascrew/ikascrew/releases
 
 ## Create Project
 
@@ -27,20 +23,15 @@ ikascrew init [project]
 ## Use
 
 ikascrew play [project]
+
     -> ikascrew server [project]
     -> ikascrew client
 
 
-## Controller
-
-http://localhost:5555
+# Develop
 
 
-## Memo
+go get github.com/ikascrew/ikascrew
 
-クライアント側の設定方法を考える
-現在の情報の正確な取得
-マイク画像によるエフェクト
-
-
+dep ensure
 
