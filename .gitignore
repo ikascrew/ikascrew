@@ -7,3 +7,4 @@ bin/*
 cmd/projects/*
 cmd/sample/*
 cmd/*.json
+vendor/*

@@ -14,11 +14,20 @@ RAM:4GB
 
 install opencv
 
+
+## windows
+   gcc が存在しない
+
+
+
 https://github.com/ikascrew/ikascrew/releases
 
 ## Create Project
 
 ikascrew init [project]
+
+ex:
+   ikascrew init sample
 
 ## Use
 

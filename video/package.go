@@ -26,7 +26,7 @@ func Get(t Type, n string) (ikascrew.Video, error) {
 	case IMAGE:
 		v, err = NewImage(path)
 	case MIC:
-		v, err = NewMicrophone()
+		//v, err = NewMicrophone()
 	default:
 		err = fmt.Errorf("Not Support Type[%s]", t)
 	}
