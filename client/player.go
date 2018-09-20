@@ -2,20 +2,21 @@ package client
 
 import (
 	"C"
-	"unsafe"
 
 	"image"
 	"image/color"
 
 	"golang.org/x/exp/shiny/screen"
 
-	"github.com/ikascrew/go-opencv/opencv"
 	"github.com/ikascrew/ikascrew"
+
+	"gocv.io/x/gocv"
 )
 
 type Player struct {
+	name   string
 	idx    int
-	target []*opencv.IplImage
+	target []gocv.Mat
 	*Part
 }
 
@@ -27,45 +28,59 @@ func NewPlayer(w screen.Window, s screen.Screen) (*Player, error) {
 	p.Init(w, s, r)
 
 	p.idx = 0
-	p.target = make([]*opencv.IplImage, 0)
+	p.target = make([]gocv.Mat, 0)
 
 	return p, nil
 }
 
 func (p *Player) setFile(n string) {
 
+	if p.name == n {
+		return
+	}
+
 	p.idx = 0
 	if len(p.target) != 0 {
 		work := p.target
 		go func() {
 			for _, elm := range work {
-				elm.Release()
+				elm.Close()
 			}
 		}()
 	}
 
-	p.target = make([]*opencv.IplImage, 5)
+	p.name = n
+	p.target = make([]gocv.Mat, 5)
 
 	d := ikascrew.ProjectName()
-	cap := opencv.NewFileCapture(d + n)
+	cap, err := gocv.VideoCaptureFile(d + n)
+	if err != nil {
+		return
+	}
+
 	if cap == nil {
 		return
 	}
-	frames := int(cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
+	defer cap.Close()
+	frames := cap.Get(gocv.VideoCaptureFrameCount)
 
 	for idx := 0; idx < 5; idx++ {
-		frame := int(idx / 5 * int(frames))
-		cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
-		img := cap.QueryFrame()
-		p.target[idx] = img.Clone()
+
+		frame := int(float64(idx) / 5.0 * float64(frames))
+		cap.Set(gocv.VideoCapturePosFrames, float64(frame))
+
+		mat := gocv.NewMat()
+		cap.Read(&mat)
+		p.target[idx] = mat
 	}
 
-	cap.Release()
-
-	p.Draw()
 }
 
 func (p *Player) Draw() {
+
+	if len(p.target) <= 0 {
+		return
+	}
 
 	m := p.Part.buffer.RGBA()
 	p.idx++
@@ -74,10 +89,9 @@ func (p *Player) Draw() {
 	}
 	ipl := p.target[p.idx]
 
-	var height, channels, step int = ipl.Height(), ipl.Channels(), ipl.WidthStep()
-	var limg_ptr unsafe.Pointer = ipl.ImageData()
-	var data []C.char = (*[1 << 30]C.char)(limg_ptr)[:height*step : height*step]
+	var height, channels, step int = ipl.Rows(), ipl.Channels(), ipl.Step()
 
+	data := ipl.DataPtrUint8()
 	c := color.NRGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}
 	for y := 0; y < height; y++ {
 		for x := 0; x < step; x = x + channels {
@@ -90,6 +104,5 @@ func (p *Player) Draw() {
 			m.Set(int(x/channels), y, c)
 		}
 	}
-
 	return
 }

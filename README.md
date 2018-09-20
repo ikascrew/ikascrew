@@ -9,16 +9,12 @@ Currently it only supports Linux, but I hope to support Windows and Mac in the f
 CPU:Intel core i7
 RAM:4GB
 
-
 # Install
 
 install opencv
 
 
 ## windows
-   gcc が存在しない
-
-
 
 https://github.com/ikascrew/ikascrew/releases
 

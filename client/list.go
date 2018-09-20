@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"golang.org/x/exp/shiny/screen"
-	//"github.com/golang/glog"
 
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/tool"

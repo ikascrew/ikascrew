@@ -24,7 +24,7 @@ func Get(t Type, n string) (ikascrew.Video, error) {
 	case FILE:
 		v, err = NewFile(path)
 	case IMAGE:
-		v, err = NewImage(path)
+		//v, err = NewImage(path)
 	case MIC:
 		//v, err = NewMicrophone()
 	default:

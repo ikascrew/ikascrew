@@ -52,7 +52,7 @@ func main() {
 		if project == "" {
 			err = fmt.Errorf("Required:FileName")
 		} else {
-			err = tool.CreateMovie(project)
+			//err = tool.CreateMovie(project)
 		}
 
 	case "version":

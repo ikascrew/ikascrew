@@ -54,9 +54,7 @@ func Start() error {
 	ika.selector = win
 
 	for {
-
 		e := win.window.NextEvent()
-
 		switch e := e.(type) {
 		case key.Event:
 			win.keyListener(int(e.Code))

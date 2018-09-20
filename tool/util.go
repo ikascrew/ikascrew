@@ -10,8 +10,7 @@ import (
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
-
-	"github.com/ikascrew/go-opencv/opencv"
+	//"github.com/ikascrew/go-opencv/opencv"
 )
 
 func Search(d string, ignore []string) ([]string, error) {
@@ -51,7 +50,17 @@ func Search(d string, ignore []string) ([]string, error) {
 		}
 	}
 
-	sort.Strings(rtn)
+	sort.Slice(rtn, func(i, j int) bool {
+		pathA := rtn[i]
+		pathB := rtn[j]
+
+		slashA := len(strings.Split(pathA, "/"))
+		slashB := len(strings.Split(pathB, "/"))
+		if slashA != slashB {
+			return slashA < slashB
+		}
+		return pathA < pathB
+	})
 	return rtn, nil
 }
 
@@ -91,6 +100,7 @@ func LoadImage(f string) (image.Image, error) {
 	return m, nil
 }
 
+/*
 func CreateMovie(f string) error {
 
 	// exist file
@@ -127,8 +137,8 @@ func CreateMovie(f string) error {
 		w.WriteFrame(ipl.Clone())
 	}
 	w.Release()
-
 	fmt.Printf("Output movie[%s]\n", mp4)
 
 	return nil
 }
+*/

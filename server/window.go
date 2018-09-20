@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/golang/glog"
-	"github.com/ikascrew/go-opencv/opencv"
+	//"github.com/ikascrew/go-opencv/opencv"
 
 	"github.com/ikascrew/ikascrew"
 	pm "github.com/ikascrew/powermate"
+
+	"gocv.io/x/gocv"
 )
 
 func init() {
@@ -49,9 +51,11 @@ func (w *Window) Play(v ikascrew.Video) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	opencv.StartWindowThread()
-	win := opencv.NewWindow(w.name)
-	defer win.Destroy()
+	win := gocv.NewWindow(w.name)
+	defer win.Close()
+
+	win.MoveWindow(0, 0)
+	win.ResizeWindow(1024, 576)
 
 	err := w.stream.Switch(v)
 	if err != nil {
@@ -78,12 +82,11 @@ func (w *Window) Play(v ikascrew.Video) error {
 	return fmt.Errorf("Error : Stream is nil")
 }
 
-func (w *Window) Display(win *opencv.Window) error {
+func (w *Window) Display(win *gocv.Window) error {
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
-		//fps 30
 		time.Sleep(w.stream.Wait() * time.Millisecond)
 		wg.Done()
 	}()
@@ -92,7 +95,11 @@ func (w *Window) Display(win *opencv.Window) error {
 	if err != nil {
 		return err
 	}
-	win.ShowImage(w.stream.Add(img))
+
+	add := w.stream.Add(*img)
+
+	win.IMShow(*add)
+	win.WaitKey(1)
 
 	wg.Wait()
 

@@ -1,11 +1,12 @@
 package ikascrew
 
 import (
-	"github.com/ikascrew/go-opencv/opencv"
+	"gocv.io/x/gocv"
+	//"github.com/ikascrew/go-opencv/opencv"
 )
 
 type Video interface {
-	Next() (*opencv.IplImage, error)
+	Next() (*gocv.Mat, error)
 	Set(int)
 
 	Current() int

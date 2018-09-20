@@ -6,11 +6,15 @@ import (
 	"github.com/golang/glog"
 )
 
-var X bool
-var A bool
-var B bool
-var L2 bool
-var R2 bool
+var Y bool  //Server push
+var X bool  //Server push
+var A bool  //next Add
+var B bool  //next Delete
+var L2 bool //Server switch
+var R2 bool //Server switch
+
+// JOY_L_VERTICAL   list select
+// JOY_L_HORIZONTAL next select
 
 func (ika *IkascrewClient) controller(e xbox.Event) error {
 
@@ -52,6 +56,7 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 			if err != nil {
 				glog.Error("callEffect[" + err.Error() + "]")
 			} else {
+				ika.selector.next.delete()
 				ika.selector.next.Push()
 			}
 		} else {
@@ -59,6 +64,23 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 		}
 	} else if !e.Buttons[xbox.X] {
 		X = true
+	}
+
+	if e.Buttons[xbox.Y] && Y {
+		Y = false
+		res := ika.selector.list.get()
+		if res != "" {
+
+			ika.selector.player.setFile(res)
+			ika.selector.player.Draw()
+			ika.selector.player.Push()
+
+		} else {
+			glog.Error("Pusher Error: No Index")
+		}
+
+	} else if !e.Buttons[xbox.Y] {
+		Y = true
 	}
 
 	if e.Buttons[xbox.A] && A {

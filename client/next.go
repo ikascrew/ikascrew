@@ -8,7 +8,6 @@ import (
 
 	"golang.org/x/exp/shiny/screen"
 
-	"github.com/golang/glog"
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/tool"
 )
@@ -91,24 +90,18 @@ func (n *Next) Draw() {
 
 func (n *Next) get() string {
 	sz := len(n.resource)
-	if n.idx > sz-1 {
+	if n.idx > sz-1 || sz == 0 || n.idx < 0 {
 		return ""
 	}
 
 	rtn := n.resource[n.idx]
-
-	err := n.delete()
-	if err != nil {
-		glog.Error(err.Error())
-		return ""
-	}
 	return rtn
 }
 
 func (n *Next) delete() error {
 
 	sz := len(n.resource)
-	if n.idx > sz-1 {
+	if n.idx > sz-1 || sz == 0 || n.idx < 0 {
 		return fmt.Errorf("Pusher Index Error")
 	}
 
