@@ -9,6 +9,7 @@ import (
 
 type Window struct {
 	window screen.Window
+	client *IkascrewClient
 
 	list   *List
 	next   *Next
@@ -57,6 +58,10 @@ func NewWindow(t string, w, h int) (window *Window, err error) {
 	return
 }
 
+func (w *Window) SetClient(c *IkascrewClient) {
+	w.client = c
+}
+
 func (w *Window) Release() {
 	w.window.Release()
 	w.list.Release()
@@ -80,8 +85,10 @@ func (w *Window) keyListener(k int) {
 		w.next.setCursor(20000)
 		w.next.Push()
 	case 40:
+
 		res := w.list.get()
 		if res != "" {
+			fmt.Println("kitayo")
 			err := w.next.add(res)
 			if err != nil {
 				// TODO 無視
@@ -90,8 +97,23 @@ func (w *Window) keyListener(k int) {
 
 			w.player.setFile(res)
 			w.player.Push()
+		} else {
+			fmt.Printf("res empty \n")
 		}
+
 	case 44:
+
+		res := w.next.get()
+		if res != "" {
+			err := w.client.callEffect(res, "file")
+			if err != nil {
+			} else {
+				w.next.delete()
+				w.next.Push()
+			}
+		} else {
+		}
+
 	default:
 		fmt.Printf("Not Defined[%d]\n", k)
 	}

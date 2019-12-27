@@ -1,7 +1,10 @@
 package client
 
 import (
+	"os"
+
 	"github.com/ikascrew/ikascrew"
+	"github.com/ikascrew/ikascrew/pb"
 	"github.com/ikascrew/xbox"
 
 	"github.com/golang/glog"
@@ -15,20 +18,39 @@ func init() {
 
 type IkascrewClient struct {
 	selector *Window
+	testMode bool
 }
 
 func Start() error {
 
 	var err error
+	var rep *pb.SyncReply
+
 	err = agent.Listen(nil)
 	if err != nil {
 		return err
 	}
 
 	ika := &IkascrewClient{}
-	rep, err := ika.syncServer()
-	if err != nil {
-		return err
+
+	args := os.Args
+	if len(args) > 2 {
+		ika.testMode = true
+	} else {
+		ika.testMode = false
+	}
+
+	if ika.testMode {
+		rep = &pb.SyncReply{
+			Source:  "",
+			Type:    "",
+			Project: args[2],
+		}
+	} else {
+		rep, err = ika.syncServer()
+		if err != nil {
+			return err
+		}
 	}
 
 	err = ikascrew.Load(rep.Project)
@@ -52,6 +74,7 @@ func Start() error {
 	}
 
 	ika.selector = win
+	win.SetClient(ika)
 
 	for {
 		e := win.window.NextEvent()

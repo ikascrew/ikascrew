@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"runtime"
 	"sync"
 	"time"
 
 	"github.com/golang/glog"
-	//"github.com/ikascrew/go-opencv/opencv"
 
 	"github.com/ikascrew/ikascrew"
 	pm "github.com/ikascrew/powermate"
@@ -82,6 +83,8 @@ func (w *Window) Play(v ikascrew.Video) error {
 	return fmt.Errorf("Error : Stream is nil")
 }
 
+var counter = 0
+
 func (w *Window) Display(win *gocv.Window) error {
 
 	wg := new(sync.WaitGroup)
@@ -97,6 +100,9 @@ func (w *Window) Display(win *gocv.Window) error {
 	}
 
 	add := w.stream.Add(*img)
+
+	gocv.PutText(add, fmt.Sprintf("Count: %d 日本語", counter), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{0, 255, 0, 0}, 2)
+	counter++
 
 	win.IMShow(*add)
 	win.WaitKey(1)

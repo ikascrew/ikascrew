@@ -237,7 +237,7 @@ func (s *Stream) Effect(e pm.Event) error {
 				s.now_value++
 			}
 		}
-		fmt.Printf("Switch[%f/%f]\n", s.now_value, SWITCH_VALUE)
+		fmt.Printf("Switch[%f/%d]\n", s.now_value, SWITCH_VALUE)
 	case WAIT:
 		switch e.Type {
 		case pm.Rotation:

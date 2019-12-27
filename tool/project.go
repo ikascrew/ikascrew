@@ -3,7 +3,7 @@ package tool
 import (
 	"fmt"
 	"image"
-	"image/jpeg"
+	"image/draw"
 	"os"
 	"strings"
 
@@ -84,30 +84,28 @@ func CreateProject(dir string) error {
 		//Size Check
 
 		if isImage(work) {
-			/*
-				ft = "image"
-				movie.Image = THUMB + work
+			ft = "image"
+			movie.Image = THUMB + work
 
-				out := thumb + work
-				mkIdx := strings.LastIndex(out, "/")
-				d := string(out[:mkIdx])
-				err = os.MkdirAll(d, 0777)
+			out := thumb + work
+			mkIdx := strings.LastIndex(out, "/")
+			d := string(out[:mkIdx])
+			err = os.MkdirAll(d, 0777)
 
-				err = createThumbnail(f, out, cut)
-				if err != nil {
-					return fmt.Errorf("Error Create Thumbnail:%s", err)
-				}
+			err = createThumbnail(f, out, cut)
+			if err != nil {
+				return fmt.Errorf("Error Create Thumbnail:%s", err)
+			}
 
-				out = icon + work
-				mkIdx = strings.LastIndex(out, "/")
-				tmp := string(out[:mkIdx])
-				err = os.MkdirAll(tmp, 0777)
+			out = icon + work
+			mkIdx = strings.LastIndex(out, "/")
+			tmp := string(out[:mkIdx])
+			err = os.MkdirAll(tmp, 0777)
 
-				err = createIcon(f, out)
-				if err != nil {
-					return fmt.Errorf("Error Create Icon:%s", err)
-				}
-			*/
+			err = createIcon(f, out)
+			if err != nil {
+				return fmt.Errorf("Error Create Icon:%s", err)
+			}
 		} else {
 
 			jpg := strings.Replace(work, ".mp4", ".jpg", 1)
@@ -194,31 +192,9 @@ func createIcon(in, out string) error {
 	resize := gocv.NewMat()
 	defer resize.Close()
 
-	//resize := opencv.Resize(ipl, 256, 144, opencv.CV_INTER_LINEAR)
 	gocv.Resize(*ipl, &resize, image.Point{}, 0.25, 0.25, gocv.InterpolationDefault)
-	/*
-		outFile, err := os.Create(out)
-		if err != nil {
-			return fmt.Errorf("Error OpenFile[%s]:%s", out, err)
-		}
-		defer outFile.Close()
-	*/
-
 	gocv.IMWrite(out, resize)
 
-	/*
-		img := resize.ToImage()
-		outFile, err := os.Create(out)
-		if err != nil {
-			return fmt.Errorf("Error OpenFile[%s]:%s", out, err)
-		}
-		defer outFile.Close()
-
-		option := &jpeg.Options{Quality: 100}
-		if err = jpeg.Encode(outFile, img, option); err != nil {
-			return fmt.Errorf("Error Encode:%s", err)
-		}
-	*/
 	return nil
 }
 
@@ -262,13 +238,22 @@ func createThumbnail(in, out string, cut int) error {
 			cap.Read(&m)
 
 			for m.Empty() {
+
 				frame = frame - 5
+				if frame < 0 {
+					frame = frames
+				}
 				//cap.SetProperty(opencv.CV_CAP_PROP_POS_FRAMES, float64(frame))
 				cap.Set(gocv.VideoCapturePosFrames, float64(frame))
 				cap.Read(&m)
 			}
 
 			images[idx] = m
+			if frames == 1 {
+				images[1] = m
+				images[2] = m
+				break
+			}
 
 			width += m.Cols()
 			height = m.Rows()
@@ -279,54 +264,35 @@ func createThumbnail(in, out string, cut int) error {
 		}
 	}
 
-	//thumb := opencv.CreateImage(width, height, opencv.IPL_DEPTH_8U, 3)
-	thumb := gocv.NewMatWithSize(width, height, gocv.MatTypeCV8U)
-	defer thumb.Close()
+	l := len(images)
+
+	//TODO
+	thumbRect := image.Rect(0, 0, 1024*l, 576)
+	thumb := image.NewRGBA(thumbRect)
 
 	left := 0
 	for _, elm := range images {
 
-		defer elm.Close()
+		img, err := elm.ToImage()
+		if err != nil {
+			return err
+		}
 
-		//rect := gocv.NewMatWithSize(elm.Cols(), elm.Rows(), gocv.MatTypeCV8U)
-
-		/*
-			var rect gocv.Mat
-			rect.Init(left, 0, elm.Cols(), elm.Rows())
-		*/
-
-		//thumb.SetROI(rect)
-		//gocv.Copy(elm, thumb, nil)
+		rect := image.Rect(left, 0, elm.Cols()+left, elm.Rows())
+		draw.Draw(thumb, rect, img, image.Pt(0, 0), draw.Over)
 
 		left += elm.Cols()
 	}
 
-	l := len(images)
-	//thumb.ResetROI()
-
-	resize := gocv.NewMat()
-	defer resize.Close()
-	//gocv.Resize(*ipl, &resize, image.Point{}, 0.25, 0.25, gocv.InterpolationDefault)
-	//gocv.Resize(thumb, int(left/l/2), int(height/l/2), opencv.CV_INTER_LINEAR)
-	gocv.Resize(thumb, &resize, image.Point{}, float64(left/l/2), float64(height/l/2), gocv.InterpolationDefault)
-
-	defer resize.Close()
-
-	img, err := resize.ToImage()
+	mat, err := gocv.ImageToMatRGB(thumb)
 	if err != nil {
-		return fmt.Errorf("Error ToImage[%s]:%s", out, err)
+		return err
 	}
 
-	outFile, err := os.Create(out)
-	if err != nil {
-		return fmt.Errorf("Error OpenFile[%s]:%s", out, err)
-	}
-	defer outFile.Close()
-
-	option := &jpeg.Options{Quality: 100}
-	if err = jpeg.Encode(outFile, img, option); err != nil {
-		return fmt.Errorf("Error Encode:%s", err)
-	}
+	resize := gocv.NewMatWithSize(height/6, left/6, gocv.MatTypeCV8UC3)
+	defer resize.Close()
+	gocv.Resize(mat, &resize, image.Point{}, 0.166, 0.166, gocv.InterpolationDefault)
+	gocv.IMWrite(out, resize)
 	return nil
 }
 
