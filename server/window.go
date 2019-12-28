@@ -2,8 +2,6 @@ package server
 
 import (
 	"fmt"
-	"image"
-	"image/color"
 	"runtime"
 	"sync"
 	"time"
@@ -11,7 +9,6 @@ import (
 	"github.com/golang/glog"
 
 	"github.com/ikascrew/ikascrew"
-	pm "github.com/ikascrew/powermate"
 
 	"gocv.io/x/gocv"
 )
@@ -24,8 +21,6 @@ type Window struct {
 	wait chan ikascrew.Video
 
 	stream *Stream
-
-	PowerMate bool
 }
 
 func NewWindow(name string) (*Window, error) {
@@ -94,16 +89,14 @@ func (w *Window) Display(win *gocv.Window) error {
 		wg.Done()
 	}()
 
-	img, err := w.stream.Get(w.PowerMate)
+	//イメージを取得
+	img, err := w.stream.Get()
 	if err != nil {
 		return err
 	}
-
+	//作成
 	add := w.stream.Add(*img)
-
-	gocv.PutText(add, fmt.Sprintf("Count: %d 日本語", counter), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{0, 255, 0, 0}, 2)
-	counter++
-
+	//表示
 	win.IMShow(*add)
 	win.WaitKey(1)
 
@@ -116,14 +109,10 @@ func (w *Window) SetSwitch(t string) error {
 	return w.stream.SetSwitch(t)
 }
 
-func (w *Window) Effect(e pm.Event) error {
-	return w.stream.Effect(e)
-}
-
 func (w *Window) Destroy() {
 	w.stream.Release()
 }
 
 func (w *Window) FullScreen() {
-	//w.window.SetProperty(opencv.CV_WND_PROP_FULLSCREEN, float64(opencv.CV_WINDOW_FULLSCREEN))
+	//TODO gocvでのフル
 }

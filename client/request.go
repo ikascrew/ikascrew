@@ -28,7 +28,7 @@ func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 	return r, nil
 }
 
-func (i *IkascrewClient) callEffect(f string, t string) error {
+func (i *IkascrewClient) callVolume(msg pb.VolumeMessage) error {
 
 	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
 	if err != nil {
@@ -37,16 +37,10 @@ func (i *IkascrewClient) callEffect(f string, t string) error {
 	defer conn.Close()
 	c := pb.NewIkascrewClient(conn)
 
-	r, err := c.Effect(context.Background(), &pb.EffectRequest{
-		Name: f,
-		Type: t,
-	})
-
+	_, err = c.PutVolume(context.Background(), &msg)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(r)
 	return nil
 }
 

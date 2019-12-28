@@ -5,10 +5,8 @@ import (
 	"time"
 
 	"github.com/golang/glog"
-	//"github.com/ikascrew/go-opencv/opencv"
 
 	"github.com/ikascrew/ikascrew"
-	pm "github.com/ikascrew/powermate"
 
 	"gocv.io/x/gocv"
 )
@@ -29,11 +27,11 @@ type Stream struct {
 	nextFlag bool
 	prevFlag bool
 
-	light       float64
 	empty_image gocv.Mat
 	real_image  gocv.Mat
 
-	wait float64
+	light float64
+	wait  float64
 
 	mode int
 }
@@ -41,9 +39,9 @@ type Stream struct {
 const SWITCH_VALUE = 200
 
 const (
-	SWITCH = 1
-	LIGHT  = 2
-	WAIT   = 3
+	SWITCH = 0
+	LIGHT  = 1
+	WAIT   = 2
 )
 
 func NewStream() (*Stream, error) {
@@ -104,7 +102,7 @@ func (s *Stream) Add(org gocv.Mat) *gocv.Mat {
 	return &s.real_image
 }
 
-func (s *Stream) Get(pm bool) (*gocv.Mat, error) {
+func (s *Stream) Get() (*gocv.Mat, error) {
 
 	old, err := s.getOldImage()
 	if err != nil {
@@ -114,12 +112,6 @@ func (s *Stream) Get(pm bool) (*gocv.Mat, error) {
 	if old == nil {
 		glog.Info("old == nil")
 		return s.now_video.Next()
-	}
-
-	if !pm {
-		if s.now_value != SWITCH_VALUE {
-			s.now_value++
-		}
 	}
 
 	if s.nextFlag {
@@ -192,65 +184,6 @@ func (s *Stream) Release() {
 
 func (s *Stream) Wait() time.Duration {
 	return time.Duration(s.wait + 33.0)
-}
-
-func (s *Stream) Effect(e pm.Event) error {
-	switch e.Type {
-	case pm.Press:
-		switch e.Value {
-		case pm.Up:
-			fmt.Println("Up")
-		case pm.Down:
-			if s.mode == SWITCH {
-				s.mode = LIGHT
-				fmt.Println("Light Mode")
-			} else if s.mode == LIGHT {
-				s.mode = WAIT
-				fmt.Println("Wait Mode")
-			} else {
-				s.mode = SWITCH
-				fmt.Println("Switch Mode")
-			}
-		}
-	default:
-	}
-
-	switch s.mode {
-	case LIGHT:
-		switch e.Type {
-		case pm.Rotation:
-			switch e.Value {
-			case pm.Left:
-				s.light = s.light + 0.5
-			case pm.Right:
-				s.light = s.light - 0.5
-			}
-		}
-		fmt.Printf("Light[%f]\n", s.light)
-	case SWITCH:
-		switch e.Type {
-		case pm.Rotation:
-			switch e.Value {
-			case pm.Left:
-				s.now_value--
-			case pm.Right:
-				s.now_value++
-			}
-		}
-		fmt.Printf("Switch[%f/%d]\n", s.now_value, SWITCH_VALUE)
-	case WAIT:
-		switch e.Type {
-		case pm.Rotation:
-			switch e.Value {
-			case pm.Left:
-				s.wait = s.wait + 0.1
-			case pm.Right:
-				s.wait = s.wait - 0.1
-			}
-		}
-		fmt.Printf("Wait[%f]\n", s.wait)
-	}
-	return nil
 }
 
 func (s *Stream) PrintVideos(line string) {

@@ -84,3 +84,27 @@ func (i *IkascrewServer) Switch(ctx context.Context, r *pb.SwitchRequest) (*pb.S
 	}
 	return rep, err
 }
+
+func (i *IkascrewServer) PutVolume(ctx context.Context, msg *pb.VolumeMessage) (*pb.VolumeReply, error) {
+
+	rep := pb.VolumeReply{}
+
+	idx := msg.Index
+	val := msg.Value
+
+	s := i.window.stream
+
+	s.mode = int(idx)
+
+	switch s.mode {
+	case SWITCH:
+		s.now_value = val
+	case LIGHT:
+		s.light = val
+	case WAIT:
+		s.wait = val
+	}
+
+	return &rep, nil
+
+}

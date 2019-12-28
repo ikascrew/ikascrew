@@ -6,12 +6,8 @@ import (
 
 	"github.com/golang/glog"
 
-	"github.com/google/gops/agent"
-
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/video"
-
-	pm "github.com/ikascrew/powermate"
 )
 
 func init() {
@@ -29,17 +25,10 @@ type IkascrewServer struct {
 
 func Start(d string) error {
 
-	glog.Info("Start gops Agent")
-	var err error
-	err = agent.Listen(nil)
-	if err != nil {
-		return err
-	}
-
 	glog.Info("Set max procs")
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	err = ikascrew.Load(d)
+	err := ikascrew.Load(d)
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}
@@ -60,17 +49,6 @@ func Start(d string) error {
 	ika := &IkascrewServer{
 		window: win,
 	}
-
-	glog.Info("Initialize powermate")
-	go func() {
-		pm.HandleFunc(ika.window.Effect)
-		ika.window.PowerMate = true
-		err := pm.Listen("/dev/input/powermate")
-		if err != nil {
-			ika.window.PowerMate = false
-			glog.Error("Powermate not supported[", err, "]")
-		}
-	}()
 
 	glog.Info("Start RPC")
 	go func() {

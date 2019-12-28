@@ -5,15 +5,20 @@ import (
 
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/pb"
+	pm "github.com/ikascrew/powermate"
+	vol "github.com/ikascrew/volumes"
 	"github.com/ikascrew/xbox"
 
 	"github.com/golang/glog"
-	"github.com/google/gops/agent"
-
-	"golang.org/x/mobile/event/key"
 )
 
+var vols *vol.Volumes
+
 func init() {
+	vols = vol.New()
+	vols.Add("Volume", 300)
+	vols.Add("Light", 100)
+	vols.Add("Wait", 50)
 }
 
 type IkascrewClient struct {
@@ -21,17 +26,17 @@ type IkascrewClient struct {
 	testMode bool
 }
 
+var ika *IkascrewClient
+
 func Start() error {
 
 	var err error
 	var rep *pb.SyncReply
 
-	err = agent.Listen(nil)
-	if err != nil {
-		return err
-	}
+	go vols.Start()
+	pm.HandleFunc(trigger)
 
-	ika := &IkascrewClient{}
+	ika = &IkascrewClient{}
 
 	args := os.Args
 	if len(args) > 2 {
@@ -58,6 +63,7 @@ func Start() error {
 		return err
 	}
 
+	//XBOX Controller
 	xbox.HandleFunc(ika.controller)
 	go func() {
 		err = xbox.Listen(0)
@@ -67,7 +73,17 @@ func Start() error {
 		}
 	}()
 
-	win, err := NewWindow("ikascrew client", 1536, 720)
+	//powermate
+	go func() {
+		err = pm.Listen("/dev/input/powermate")
+		if err != nil {
+			glog.Error("powermate Listen Error[" + err.Error() + "]")
+			return
+		}
+	}()
+
+	//Main
+	win, err := NewWindow("ikascrew client", 1024, 576)
 	if err != nil {
 		glog.Error("NewWindow() Error[" + err.Error() + "]")
 		return err
@@ -76,14 +92,62 @@ func Start() error {
 	ika.selector = win
 	win.SetClient(ika)
 
+	//クライアント描画
 	for {
 		e := win.window.NextEvent()
 		switch e := e.(type) {
-		case key.Event:
-			win.keyListener(int(e.Code))
 		case *Part:
 			e.Redraw()
 		}
 	}
 	return err
+}
+
+func trigger(e pm.Event) error {
+
+	val := vols.Get()
+	idx := vols.GetCursor()
+	update := false
+
+	switch e.Type {
+	case pm.Rotation:
+		switch e.Value {
+		case pm.Left:
+			val -= 1.0
+		case pm.Right:
+			val += 1.0
+		}
+
+		update = true
+	case pm.Press:
+		switch e.Value {
+		case pm.Up:
+		case pm.Down:
+			idx = idx + 1
+			if idx > 2 {
+				idx = 0
+			}
+			vols.SetCursor(idx)
+		}
+	default:
+	}
+
+	if update {
+
+		vols.Set(val)
+		var i int64 = int64(idx)
+
+		message := pb.VolumeMessage{
+			Index: i,
+			Value: val,
+		}
+
+		err := ika.callVolume(message)
+		if err != nil {
+			return err
+		}
+		//Reply で再度設定
+	}
+
+	return nil
 }

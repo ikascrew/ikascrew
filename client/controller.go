@@ -51,13 +51,9 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 		Y = false
 		res := ika.selector.next.get()
 		if res != "" {
-			err := ika.callEffect(res, "file")
-			if err != nil {
-				glog.Error("callEffect[" + err.Error() + "]")
-			} else {
-				ika.selector.next.delete()
-				ika.selector.next.Push()
-			}
+			//TOTO EffectでOKかを見てたよ？
+			ika.selector.next.delete()
+			ika.selector.next.Push()
 		} else {
 			glog.Error("Pusher Error: No Index")
 		}

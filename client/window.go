@@ -1,8 +1,6 @@
 package client
 
 import (
-	"fmt"
-
 	"golang.org/x/exp/shiny/driver"
 	"golang.org/x/exp/shiny/screen"
 )
@@ -69,6 +67,7 @@ func (w *Window) Release() {
 	w.player.Release()
 }
 
+/*
 func (w *Window) keyListener(k int) {
 
 	switch k {
@@ -118,3 +117,4 @@ func (w *Window) keyListener(k int) {
 		fmt.Printf("Not Defined[%d]\n", k)
 	}
 }
+*/

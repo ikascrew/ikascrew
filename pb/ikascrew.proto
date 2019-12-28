@@ -3,8 +3,8 @@ syntax = "proto3";
 package pb;
 service Ikascrew {
   rpc Sync (SyncRequest) returns (SyncReply) {}
-  rpc Effect (EffectRequest) returns (EffectReply) {}
   rpc Switch (SwitchRequest) returns (SwitchReply) {}
+  rpc PutVolume (VolumeMessage) returns (VolumeReply) {}
 }
 
 message SyncRequest {
@@ -33,3 +33,14 @@ message SwitchRequest {
 message SwitchReply {
   bool success = 1;
 }
+
+message VolumeMessage {
+  int64 index = 1;
+  double value = 2;
+}
+
+message VolumeReply {
+  bool success = 1;
+  repeated double valueList = 2;
+}
+
