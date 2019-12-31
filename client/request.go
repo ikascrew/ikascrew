@@ -1,17 +1,19 @@
 package client
 
 import (
-	"fmt"
-
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/ikascrew/ikascrew/pb"
 )
 
+const ServerIP = "localhost"
+
+//const ServerIP = "172.16.10.116"
+
 func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 
-	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
+	conn, err := grpc.Dial(ServerIP+":55555", grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -23,14 +25,33 @@ func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 		return nil, err
 	}
 
-	fmt.Println(r)
-
 	return r, nil
+}
+
+func (i *IkascrewClient) callEffect(f string, t string) error {
+
+	conn, err := grpc.Dial(ServerIP+":55555", grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	c := pb.NewIkascrewClient(conn)
+
+	_, err = c.Effect(context.Background(), &pb.EffectRequest{
+		Name: f,
+		Type: t,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (i *IkascrewClient) callVolume(msg pb.VolumeMessage) error {
 
-	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
+	conn, err := grpc.Dial(ServerIP+":55555", grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -54,14 +75,14 @@ func (i *IkascrewClient) callPrev() error {
 
 func (i *IkascrewClient) callSwitch(t string) error {
 
-	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
+	conn, err := grpc.Dial(ServerIP+":55555", grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 	c := pb.NewIkascrewClient(conn)
 
-	r, err := c.Switch(context.Background(), &pb.SwitchRequest{
+	_, err = c.Switch(context.Background(), &pb.SwitchRequest{
 		Type: t,
 	})
 
@@ -69,6 +90,5 @@ func (i *IkascrewClient) callSwitch(t string) error {
 		return err
 	}
 
-	fmt.Println(r)
 	return nil
 }

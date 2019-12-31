@@ -4,6 +4,7 @@ package pb;
 service Ikascrew {
   rpc Sync (SyncRequest) returns (SyncReply) {}
   rpc Switch (SwitchRequest) returns (SwitchReply) {}
+  rpc Effect (EffectRequest) returns (EffectReply) {}
   rpc PutVolume (VolumeMessage) returns (VolumeReply) {}
 }
 

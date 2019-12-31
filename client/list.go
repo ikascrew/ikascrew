@@ -35,8 +35,8 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 		return nil, err
 	}
 
-	l.images = make([]image.Image, len(paths))
-	l.resource = make([]string, len(paths))
+	l.images = make([]image.Image, len(paths)+1)
+	l.resource = make([]string, len(paths)+1)
 
 	for idx, path := range paths {
 		l.images[idx], _ = tool.LoadImage(path)
@@ -45,6 +45,7 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 		resource := mpg
 		l.resource[idx] = resource
 	}
+
 	return l, nil
 }
 

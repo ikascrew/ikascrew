@@ -8,9 +8,10 @@ import (
 type Type string
 
 const (
-	FILE  Type = "file"
-	IMAGE Type = "image"
-	MIC   Type = "mic"
+	FILE      Type = "file"
+	IMAGE     Type = "image"
+	MIC       Type = "mic"
+	COUNTDOWN Type = "countdown"
 )
 
 func Get(t Type, n string) (ikascrew.Video, error) {
@@ -23,6 +24,8 @@ func Get(t Type, n string) (ikascrew.Video, error) {
 	switch t {
 	case FILE:
 		v, err = NewFile(path)
+	case COUNTDOWN:
+		v, err = NewCountdown(path)
 	case IMAGE:
 		//v, err = NewImage(path)
 	case MIC:

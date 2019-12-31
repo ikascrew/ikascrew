@@ -106,6 +106,10 @@ func Start() error {
 func trigger(e pm.Event) error {
 
 	val := vols.Get()
+	if zero {
+		val = 0
+		zero = false
+	}
 	idx := vols.GetCursor()
 	update := false
 
@@ -146,8 +150,15 @@ func trigger(e pm.Event) error {
 		if err != nil {
 			return err
 		}
+
 		//Reply で再度設定
 	}
 
 	return nil
+}
+
+var zero = false
+
+func setZero() {
+	zero = true
 }

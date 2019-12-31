@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/ikascrew/xbox"
+	"strings"
 
 	"github.com/golang/glog"
+	"github.com/ikascrew/xbox"
 )
 
 var Y bool  //Server push
@@ -51,9 +52,22 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 		Y = false
 		res := ika.selector.next.get()
 		if res != "" {
-			//TOTO EffectでOKかを見てたよ？
-			ika.selector.next.delete()
-			ika.selector.next.Push()
+
+			t := "file"
+			if strings.Index(res, "countdown") >= 0 {
+				t = "countdown"
+			}
+			err := ika.callEffect(res, t)
+			if err != nil {
+				glog.Error("callEffect[" + err.Error() + "]")
+			} else {
+
+				//0
+				setZero()
+
+				ika.selector.next.delete()
+				ika.selector.next.Push()
+			}
 		} else {
 			glog.Error("Pusher Error: No Index")
 		}
