@@ -2,7 +2,6 @@ package ikascrew
 
 import (
 	"gocv.io/x/gocv"
-	//"github.com/ikascrew/go-opencv/opencv"
 )
 
 type Video interface {
@@ -14,4 +13,8 @@ type Video interface {
 	Source() string
 
 	Release() error
+}
+
+type Effect interface {
+	Run(Video, Video) Video
 }

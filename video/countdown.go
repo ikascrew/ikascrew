@@ -15,8 +15,9 @@ func init() {
 
 var loc, _ = time.LoadLocation("Asia/Tokyo")
 
-//var Target = time.Date(2020, time.January, 1, 0, 0, 0, 0, loc)
-var Target = time.Date(2019, time.December, 31, 9, 2, 0, 0, loc)
+var Target = time.Date(2020, time.January, 1, 0, 0, 0, 0, loc)
+
+//var Target = time.Date(2019, time.December, 31, 9, 2, 0, 0, loc)
 var jst = time.FixedZone("Asia/Tokyo", 9*60*60)
 
 const Line1 = "Happy"

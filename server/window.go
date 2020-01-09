@@ -51,7 +51,9 @@ func (w *Window) Play(v ikascrew.Video) error {
 	defer win.Close()
 
 	win.MoveWindow(0, 0)
-	win.ResizeWindow(1024, 576)
+
+	//TODO 画面値は設定値
+	win.ResizeWindow(1280, 720)
 
 	err := w.stream.Switch(v)
 	if err != nil {
