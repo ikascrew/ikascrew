@@ -1,3 +1,8 @@
+I am ikascrew.
+I am a program born to transform "VJ System".
+
+# Overview
+
 "ikascrew" is a software designed to make VJ easy with PC.
 VJ can be done just by preparing the personal computer and MP4.
 
@@ -40,7 +45,6 @@ ikascrew play [project]
 go get github.com/ikascrew/ikascrew
 
 # 現在の状況
-
 
 2019年12月31日に大きな変更を開始しています。
 現在、joystickとpowermateでコントロールしていますが、

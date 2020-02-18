@@ -27,6 +27,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20191229070316-58d4fcbce2a7 // indirect
 	github.com/prometheus/client_model v0.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.5.1 // indirect
+	github.com/shirou/gopsutil v2.19.12+incompatible
 	github.com/simulatedsimian/joystick v1.0.1
 	github.com/stretchr/objx v0.2.0 // indirect
 	go.opencensus.io v0.22.2 // indirect

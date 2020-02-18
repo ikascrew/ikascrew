@@ -1,10 +1,8 @@
 package video
 
-/*
 import (
 	"fmt"
 
-	//"github.com/ikascrew/go-opencv/opencv"
 	"gocv.io/x/gocv"
 )
 
@@ -14,7 +12,7 @@ func init() {
 type Image struct {
 	current int
 	name    string
-	bg      gocv.Mat
+	src     *gocv.Mat
 }
 
 func NewImage(f string) (*Image, error) {
@@ -22,21 +20,23 @@ func NewImage(f string) (*Image, error) {
 		name:    f,
 		current: 0,
 	}
-	wk := gocv.LoadImage(f)
-	img.bg = wk.Clone()
-	if img.bg == nil {
+
+	wk := gocv.IMRead(f, gocv.IMReadColor)
+	if wk.Empty() {
 		return nil, fmt.Errorf("Error:LoadImage[%s]", f)
 	}
+
+	img.src = &wk
 
 	return &img, nil
 }
 
-func (v *Image) Next() (gocv.Mat, error) {
+func (v *Image) Next() (*gocv.Mat, error) {
 	v.current++
 	if v.current == v.Size() {
 		v.current = 0
 	}
-	return v.bg, nil
+	return v.src, nil
 }
 
 func (v *Image) Set(f int) {
@@ -56,10 +56,8 @@ func (v *Image) Source() string {
 }
 
 func (v *Image) Release() error {
-	if v.bg != nil {
-		v.bg.Release()
+	if !v.src.Empty() {
+		v.src.Close()
 	}
-	v.bg = nil
 	return nil
 }
-*/

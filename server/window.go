@@ -20,6 +20,8 @@ type Window struct {
 	name string
 	wait chan ikascrew.Video
 
+	win *gocv.Window
+
 	stream *Stream
 }
 
@@ -50,10 +52,13 @@ func (w *Window) Play(v ikascrew.Video) error {
 	win := gocv.NewWindow(w.name)
 	defer win.Close()
 
+	w.win = win
+
 	win.MoveWindow(0, 0)
 
 	//TODO 画面値は設定値
-	win.ResizeWindow(1280, 720)
+	win.ResizeWindow(1024, 576)
+	//w.FullScreen()
 
 	err := w.stream.Switch(v)
 	if err != nil {
@@ -69,7 +74,7 @@ func (w *Window) Play(v ikascrew.Video) error {
 				glog.Error("Stream Push Error:", err)
 			}
 		default:
-			err := w.Display(win)
+			err := w.Display()
 			if err != nil {
 				glog.Error("Window Display Error:", err)
 			}
@@ -82,7 +87,7 @@ func (w *Window) Play(v ikascrew.Video) error {
 
 var counter = 0
 
-func (w *Window) Display(win *gocv.Window) error {
+func (w *Window) Display() error {
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
@@ -99,8 +104,8 @@ func (w *Window) Display(win *gocv.Window) error {
 	//作成
 	add := w.stream.Add(*img)
 	//表示
-	win.IMShow(*add)
-	win.WaitKey(1)
+	w.win.IMShow(*add)
+	w.win.WaitKey(1)
 
 	wg.Wait()
 
@@ -116,5 +121,5 @@ func (w *Window) Destroy() {
 }
 
 func (w *Window) FullScreen() {
-	//TODO gocvでのフル
+	w.win.SetWindowProperty(gocv.WindowPropertyFullscreen, gocv.WindowFullscreen)
 }
