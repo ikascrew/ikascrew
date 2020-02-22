@@ -83,7 +83,7 @@ func Start() error {
 	}()
 
 	//Main
-	win, err := NewWindow("ikascrew client", 1024, 576)
+	win, err := NewWindow("ikascrew client", 1536, 766)
 	if err != nil {
 		glog.Error("NewWindow() Error[" + err.Error() + "]")
 		return err
@@ -108,6 +108,7 @@ func trigger(e pm.Event) error {
 	val := vols.Get()
 	if zero {
 		val = 0
+		vols.SetCursor(0)
 		zero = false
 	}
 	idx := vols.GetCursor()

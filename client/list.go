@@ -13,6 +13,8 @@ import (
 	"github.com/ikascrew/ikascrew/tool"
 )
 
+var max = 0
+
 type List struct {
 	cursor   int
 	idx      int
@@ -45,6 +47,8 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 		resource := mpg
 		l.resource[idx] = resource
 	}
+
+	max = len(paths) * 100 * 100
 
 	return l, nil
 }
@@ -122,5 +126,15 @@ func (l *List) get() string {
 
 func (l *List) setCursor(d int) {
 	l.cursor = l.cursor + d
+	l.Draw()
+}
+
+func (l *List) zeroCursor() {
+	l.cursor = 0
+	l.Draw()
+}
+
+func (l *List) maxCursor() {
+	l.cursor = l.cursor + max
 	l.Draw()
 }

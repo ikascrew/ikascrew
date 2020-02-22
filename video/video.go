@@ -12,7 +12,11 @@ const (
 	IMAGE     Type = "image"
 	MIC       Type = "mic"
 	COUNTDOWN Type = "countdown"
+	TERMINAL  Type = "terminal"
+	LOOP      Type = "loop"
 )
+
+//var maps map[string]VideoFactory
 
 func Get(t Type, n string) (ikascrew.Video, error) {
 
@@ -26,8 +30,12 @@ func Get(t Type, n string) (ikascrew.Video, error) {
 		v, err = NewFile(path)
 	case COUNTDOWN:
 		v, err = NewCountdown(path)
+	case TERMINAL:
+		v, err = NewTerminal(path)
 	case IMAGE:
-		//v, err = NewImage(path)
+		v, err = NewImage(path)
+	case LOOP:
+		v, err = NewLoopFile(path)
 	case MIC:
 		//v, err = NewMicrophone()
 	default:

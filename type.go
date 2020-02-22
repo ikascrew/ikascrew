@@ -2,8 +2,11 @@ package ikascrew
 
 import (
 	"gocv.io/x/gocv"
-	//"github.com/ikascrew/go-opencv/opencv"
 )
+
+type VideoFactory interface {
+	New(...string) Video
+}
 
 type Video interface {
 	Next() (*gocv.Mat, error)
@@ -14,4 +17,8 @@ type Video interface {
 	Source() string
 
 	Release() error
+}
+
+type Effect interface {
+	Run(Video, Video) Video
 }

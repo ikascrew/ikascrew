@@ -27,21 +27,27 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 	}
 
 	if e.Buttons[xbox.L1] && L1 {
-		L1 = false
-		err := ika.callPrev()
-		if err != nil {
-			glog.Error("callPrev[" + err.Error() + "]")
-		}
+		ika.selector.list.maxCursor()
+		/*
+			L1 = false
+			err := ika.callPrev()
+			if err != nil {
+				glog.Error("callPrev[" + err.Error() + "]")
+			}
+		*/
 	} else if !e.Buttons[xbox.L1] {
 		L1 = true
 	}
 
 	if e.Buttons[xbox.R1] && R1 {
-		R1 = false
-		err := ika.callNext()
-		if err != nil {
-			glog.Error("callNext[" + err.Error() + "]")
-		}
+		ika.selector.list.zeroCursor()
+		/*
+			R1 = false
+			err := ika.callNext()
+			if err != nil {
+				glog.Error("callNext[" + err.Error() + "]")
+			}
+		*/
 	} else if !e.Buttons[xbox.R1] {
 		R1 = true
 	}
