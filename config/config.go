@@ -3,6 +3,9 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+
+	"github.com/ikascrew/ikasbox/handler"
 )
 
 type AppConfig struct {
@@ -24,15 +27,36 @@ func init() {
 
 func Load(p string) (*AppConfig, error) {
 
-	raw, err := ioutil.ReadFile(p + "/app.json")
+	url := "http://localhost:5555/project/content/list/" + p
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	app := &AppConfig{}
 
-	err = json.Unmarshal(raw, app)
+	defer resp.Body.Close()
+
+	byteArray, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	return app, nil
+
+	res := handler.ProjectResponse{}
+
+	err = json.Unmarshal(byteArray, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	def := Default{
+		Type: "terminal",
+		Name: "blank",
+	}
+
+	app := AppConfig{
+		Width:   res.Project.Width,
+		Height:  res.Project.Height,
+		Default: def,
+	}
+
+	return &app, nil
 }

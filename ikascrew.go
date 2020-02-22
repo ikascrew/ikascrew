@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ikascrew/ikascrew/config"
-
-	"github.com/golang/glog"
 )
 
 var project string
@@ -21,8 +19,6 @@ func ProjectName() string {
 }
 
 func Load(name string) error {
-
-	glog.Info("Loading Project[" + name + "]")
 
 	project = name
 	conf, err := config.Load(project)

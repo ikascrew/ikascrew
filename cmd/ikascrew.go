@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/golang/glog"
-
 	"github.com/ikascrew/ikascrew/client"
 	"github.com/ikascrew/ikascrew/server"
-	"github.com/ikascrew/ikascrew/tool"
 )
 
 const VERSION = "0.0.0"
@@ -22,7 +19,6 @@ func main() {
 	l := len(args)
 	fmt.Println(args)
 	if l < 1 {
-		glog.Error("Error:Argument[init|server|client|version|tool]")
 		os.Exit(1)
 	}
 
@@ -34,12 +30,6 @@ func main() {
 
 	var err error
 	switch cmd {
-	case "init":
-		if project == "" {
-			err = fmt.Errorf("Required:ProjectName")
-		} else {
-			err = tool.CreateProject(project)
-		}
 	case "server":
 		if project == "" {
 			err = fmt.Errorf("Required:ProjectName")
@@ -58,14 +48,12 @@ func main() {
 	case "version":
 		fmt.Println("ikascrew " + VERSION)
 	default:
-		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
+		err = fmt.Errorf("Error:ikascrew command[server|client]")
 	}
 
 	if err != nil {
-		glog.Error(err)
 		os.Exit(1)
 	}
 
-	glog.Info("Done!")
 	os.Exit(0)
 }
