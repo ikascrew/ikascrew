@@ -21,8 +21,6 @@ type Terminal struct {
 	name   string
 	source *gocv.Mat
 
-	cap *gocv.VideoCapture
-
 	lines []string
 
 	now int
@@ -36,20 +34,10 @@ func NewTerminal(file string) (*Terminal, error) {
 	}
 	var err error
 
-	f.cap, err = gocv.VideoCaptureFile(file)
-	if err != nil {
-		return nil, err
-	}
+	source := gocv.NewMatWithSize(ikascrew.Config.Height, ikascrew.Config.Width, gocv.MatTypeCV8UC3)
+	f.source = &source
 
-	if f.cap == nil {
-		return nil, fmt.Errorf("New Capture Error:[%s]", f)
-	}
-
-	//f.frames = int(f.cap.GetProperty(opencv.CV_CAP_PROP_FRAME_COUNT))
-	f.frames = int(f.cap.Get(gocv.VideoCaptureFrameCount))
-	v := gocv.NewMatWithSize(ikascrew.Config.Height, ikascrew.Config.Width, gocv.MatTypeCV8UC3)
-
-	f.source = &v
+	f.frames = 200
 
 	cs, err := cpu.Info()
 	cpuLine := make([]string, 0)
@@ -115,28 +103,17 @@ func NewTerminal(file string) (*Terminal, error) {
 
 func (v *Terminal) Next() (*gocv.Mat, error) {
 
-	if v.cap == nil {
-		return nil, fmt.Errorf("Error:Caputure is nil")
-	}
-
-	//pos := int(v.cap.GetProperty(opencv.CV_CAP_PROP_POS_FRAMES))
-	pos := int(v.cap.Get(gocv.VideoCapturePosFrames))
-	if pos == v.Size() {
-		v.Set(1)
-	}
-
-	v.cap.Read(v.source)
-	if v.source.Empty() {
-		v.Set(1)
-		return nil, fmt.Errorf("Error:Image is nil")
-	}
-
 	left := 20
 	height := 30
 	fps := 4
 
 	//終了文字数
 	n := v.now / fps
+
+	v.source.Close()
+
+	newV := gocv.NewMatWithSize(ikascrew.Config.Height, ikascrew.Config.Width, gocv.MatTypeCV8UC3)
+	v.source = &newV
 
 	for idx, line := range v.lines {
 
@@ -164,11 +141,10 @@ func (v *Terminal) Next() (*gocv.Mat, error) {
 }
 
 func (v *Terminal) Set(f int) {
-	v.cap.Set(gocv.VideoCapturePosFrames, float64(f))
 }
 
 func (v *Terminal) Current() int {
-	return int(v.cap.Get(gocv.VideoCapturePosFrames))
+	return 1
 }
 
 func (v *Terminal) Size() int {
@@ -180,9 +156,6 @@ func (v *Terminal) Source() string {
 }
 
 func (v *Terminal) Release() error {
-	if v.cap != nil {
-		v.cap.Close()
-	}
-	v.cap = nil
+	v.source.Close()
 	return nil
 }
