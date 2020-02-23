@@ -39,12 +39,10 @@ func (i *IkascrewServer) Sync(ctx context.Context, r *pb.SyncRequest) (*pb.SyncR
 
 	i.window.FullScreen()
 
-	//TODO Now
-
 	rep := &pb.SyncReply{
 		Source:  "wire/1.mp4",
 		Type:    "file",
-		Project: ikascrew.ProjectName(),
+		Project: int64(ikascrew.ProjectID()),
 	}
 
 	return rep, nil

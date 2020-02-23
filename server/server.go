@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"runtime"
+	"strconv"
 
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/video"
@@ -25,7 +26,11 @@ func Start(d string) error {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	err := ikascrew.Load(d)
+	p, _ := strconv.Atoi(d)
+
+	p64 := int64(p)
+
+	err := ikascrew.Load(p64)
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}

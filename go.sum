@@ -40,6 +40,8 @@ github.com/ikascrew/ikasbox v0.0.0-20200215015106-8c22f05b89c3 h1:Fud+62q7hRGE0s
 github.com/ikascrew/ikasbox v0.0.0-20200215015106-8c22f05b89c3/go.mod h1:7FU3jILup2dxqZtQRIarC/ghr+btTnWM9gGkjcp8Jo8=
 github.com/ikascrew/ikasbox v0.0.0-20200222031902-1f5b5033473a h1:NPyk03V2sUtaUmjFVGYhjRDsHpj8NUbuUlepfb6c3qA=
 github.com/ikascrew/ikasbox v0.0.0-20200222031902-1f5b5033473a/go.mod h1:3w44dobKBVuj7pR1+S+e3X+oOlClmKix5pzMhrav/hI=
+github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89 h1:Wnr1idyWfSoLT1QAWegaS6VCy3rRGESaCV+FFv7Q9Z4=
+github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89/go.mod h1:3w44dobKBVuj7pR1+S+e3X+oOlClmKix5pzMhrav/hI=
 github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88 h1:IkkaZJl1pc7nDYmZydaT5pfqN12GEw6Fvo7xTMZBhh8=
 github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88/go.mod h1:U8x+U/5XgLIE4R7F+EsxTw/VlMIwEVvWVBgffnqjcL0=
 github.com/ikascrew/volumes v0.0.0-20191110010825-799f11692e4c h1:bnnvszR81epeu/4XTtMVtCQN7egNW2I6uni70RJ3dvY=
@@ -68,6 +70,8 @@ github.com/monochromegane/argen v0.0.0-20150711140148-c37112f9dc50 h1:OXJAL6OEXz
 github.com/monochromegane/argen v0.0.0-20150711140148-c37112f9dc50/go.mod h1:gJKibhhzPqfWoh9OBPSlCKX8t6ozrdL98a5YFHsUOWU=
 github.com/monochromegane/goban v0.0.0-20141019070712-284a52313eb5 h1:SRoJNf6wIoGXS+6ub99tkmScUIm9+mrRJnuXT8bhZo4=
 github.com/monochromegane/goban v0.0.0-20141019070712-284a52313eb5/go.mod h1:iBGyephBWAqf9UJdCwVAB9TZTe6N9VWrHoea+08dg+I=
+github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
+github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
 github.com/nsf/termbox-go v0.0.0-20190817171036-93860e161317/go.mod h1:IuKpRQcYE1Tfu+oAQqaLisqDeXgjyyltCfsaoYN18NQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=

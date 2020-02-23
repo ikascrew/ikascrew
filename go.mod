@@ -11,12 +11,13 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.3.3
 	github.com/google/go-cmp v0.3.1 // indirect
-	github.com/ikascrew/ikasbox v0.0.0-20200222031902-1f5b5033473a
+	github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89
 	github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88
 	github.com/ikascrew/volumes v0.0.0-20191110010825-799f11692e4c
 	github.com/ikascrew/xbox v0.0.0-20191228051708-da808c0d61a2
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/shirou/gopsutil v2.20.1+incompatible
 	github.com/simulatedsimian/joystick v1.0.1 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect

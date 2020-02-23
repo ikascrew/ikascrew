@@ -80,7 +80,7 @@ func write(in string, out string) error {
 		return err
 	}
 
-	writer, err := gocv.VideoWriterFile(out, "X264", 29, w, h, true)
+	writer, err := gocv.VideoWriterFile(out, "MP4V", 29, w, h, true)
 	if err != nil {
 		return fmt.Errorf("error opening video writer file: %v\n", in)
 	}

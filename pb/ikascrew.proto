@@ -14,7 +14,7 @@ message SyncRequest {
 message SyncReply {
   string source = 1;
   string type = 2;
-  string project = 3;
+  int64  project = 3;
 }
 
 message EffectRequest {

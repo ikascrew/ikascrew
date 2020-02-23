@@ -8,7 +8,6 @@ import (
 
 	"golang.org/x/exp/shiny/screen"
 
-	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/tool"
 )
 
@@ -133,8 +132,7 @@ func (n *Next) add(f string) error {
 
 	icon := strings.Replace(f, ".mp4", ".jpg", 1)
 
-	d := ikascrew.ProjectName()
-	file := d + "/.client/icon" + icon
+	file := "./.client/icon" + icon
 
 	img, err := tool.LoadImage(file)
 

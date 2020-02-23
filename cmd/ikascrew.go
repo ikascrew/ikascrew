@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/ikascrew/ikascrew/client"
 	"github.com/ikascrew/ikascrew/server"
+	"github.com/ikascrew/ikascrew/tool"
 )
 
 const VERSION = "0.0.0"
@@ -30,6 +32,12 @@ func main() {
 
 	var err error
 	switch cmd {
+	case "init":
+		if project == "" {
+			err = fmt.Errorf("Required:ProjectName")
+		} else {
+			err = tool.CreateProject(project)
+		}
 	case "server":
 		if project == "" {
 			err = fmt.Errorf("Required:ProjectName")
@@ -52,6 +60,7 @@ func main() {
 	}
 
 	if err != nil {
+		log.Println(err)
 		os.Exit(1)
 	}
 
