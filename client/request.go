@@ -8,9 +8,9 @@ import (
 )
 
 //const ServerIP = "172.16.10.116"
-const ServerIP = "192.168.12.1"
+//const ServerIP = "192.168.12.1"
 
-//const ServerIP = "localhost"
+const ServerIP = "localhost"
 
 func (i *IkascrewClient) syncServer() (*pb.SyncReply, error) {
 

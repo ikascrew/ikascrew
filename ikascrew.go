@@ -4,27 +4,28 @@ import (
 	"fmt"
 
 	"github.com/ikascrew/ikascrew/config"
-
-	"github.com/golang/glog"
 )
 
-var project string
+var project int
 var Config *config.AppConfig
 
 func init() {
-	project = ""
+	project = 0
 	Config = nil
 }
 
-func ProjectName() string {
+func ProjectID() int {
 	return project
 }
 
-func Load(name string) error {
+func Load(id int64) error {
 
-	glog.Info("Loading Project[" + name + "]")
+	var err error
+	project = int(id)
+	if err != nil {
+		return fmt.Errorf("project id miss: %s[%v]", id, err)
+	}
 
-	project = name
 	conf, err := config.Load(project)
 	if err != nil {
 		return fmt.Errorf("Error LoadConfig[%v]", err)

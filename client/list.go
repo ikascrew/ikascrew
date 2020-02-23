@@ -9,7 +9,6 @@ import (
 
 	"golang.org/x/exp/shiny/screen"
 
-	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/tool"
 )
 
@@ -31,7 +30,8 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 	l.Part = &Part{}
 	l.Init(w, s, r)
 
-	work := ikascrew.ProjectName() + "/.client/thumb"
+	work := "./.client/thumb"
+
 	paths, err := tool.Search(work, nil)
 	if err != nil {
 		return nil, err

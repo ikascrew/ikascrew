@@ -8,8 +8,6 @@ import (
 
 	"golang.org/x/exp/shiny/screen"
 
-	"github.com/ikascrew/ikascrew"
-
 	"gocv.io/x/gocv"
 )
 
@@ -52,8 +50,8 @@ func (p *Player) setFile(n string) {
 	p.name = n
 	p.target = make([]gocv.Mat, 5)
 
-	d := ikascrew.ProjectName()
-	cap, err := gocv.VideoCaptureFile(d + n)
+	//TODO いらない
+	cap, err := gocv.VideoCaptureFile(n)
 	if err != nil {
 		return
 	}
@@ -73,7 +71,6 @@ func (p *Player) setFile(n string) {
 		cap.Read(&mat)
 		p.target[idx] = mat
 	}
-
 }
 
 func (p *Player) Draw() {

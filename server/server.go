@@ -3,8 +3,7 @@ package server
 import (
 	"fmt"
 	"runtime"
-
-	"github.com/golang/glog"
+	"strconv"
 
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/video"
@@ -25,22 +24,23 @@ type IkascrewServer struct {
 
 func Start(d string) error {
 
-	glog.Info("Set max procs")
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	err := ikascrew.Load(d)
+	p, _ := strconv.Atoi(d)
+
+	p64 := int64(p)
+
+	err := ikascrew.Load(p64)
 	if err != nil {
 		return fmt.Errorf("Error Loading directory:%s", err)
 	}
 
-	glog.Info("Set Default video")
 	v, err := video.Get(video.Type(ikascrew.Config.Default.Type),
 		ikascrew.Config.Default.Name)
 	if err != nil {
 		return fmt.Errorf("Error:Video Load[%v]", err)
 	}
 
-	glog.Info("Create main window")
 	win, err := NewWindow("ikascrew")
 	if err != nil {
 		return fmt.Errorf("Error:Create New Window[%v]", err)
@@ -50,11 +50,9 @@ func Start(d string) error {
 		window: win,
 	}
 
-	glog.Info("Start RPC")
 	go func() {
 		ika.startRPC()
 	}()
 
-	glog.Info("Let's Play!")
 	return win.Play(v)
 }

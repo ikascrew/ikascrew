@@ -2,6 +2,7 @@ package client
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/ikascrew/ikascrew"
 	"github.com/ikascrew/ikascrew/pb"
@@ -46,10 +47,11 @@ func Start() error {
 	}
 
 	if ika.testMode {
+		pid, _ := strconv.Atoi(args[2])
 		rep = &pb.SyncReply{
 			Source:  "",
 			Type:    "",
-			Project: args[2],
+			Project: int64(pid),
 		}
 	} else {
 		rep, err = ika.syncServer()

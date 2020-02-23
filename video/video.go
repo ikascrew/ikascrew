@@ -20,7 +20,7 @@ const (
 
 func Get(t Type, n string) (ikascrew.Video, error) {
 
-	path := ikascrew.ProjectName() + "/" + n
+	path := n
 
 	var v ikascrew.Video
 	var err error

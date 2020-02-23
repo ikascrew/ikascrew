@@ -3,9 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
-
-	"github.com/golang/glog"
 
 	"github.com/ikascrew/ikascrew/client"
 	"github.com/ikascrew/ikascrew/server"
@@ -22,7 +21,6 @@ func main() {
 	l := len(args)
 	fmt.Println(args)
 	if l < 1 {
-		glog.Error("Error:Argument[init|server|client|version|tool]")
 		os.Exit(1)
 	}
 
@@ -58,14 +56,13 @@ func main() {
 	case "version":
 		fmt.Println("ikascrew " + VERSION)
 	default:
-		err = fmt.Errorf("Error:ikascrew command[init|server|client]")
+		err = fmt.Errorf("Error:ikascrew command[server|client]")
 	}
 
 	if err != nil {
-		glog.Error(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 
-	glog.Info("Done!")
 	os.Exit(0)
 }
