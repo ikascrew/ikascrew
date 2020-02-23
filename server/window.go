@@ -56,8 +56,7 @@ func (w *Window) Play(v ikascrew.Video) error {
 
 	win.MoveWindow(0, 0)
 
-	//TODO 画面値は設定値
-	win.ResizeWindow(1024, 576)
+	win.ResizeWindow(640, 360)
 	//w.FullScreen()
 
 	err := w.stream.Switch(v)

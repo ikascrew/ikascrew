@@ -159,7 +159,13 @@ func (s *Stream) getOldImage() (*gocv.Mat, error) {
 	alpha := s.old_value / SWITCH_VALUE
 
 	next, _ := s.old_video.Next()
+	if next == nil {
+		return &s.old_image, nil
+	}
 	now, _ := s.release_video.Next()
+	if now == nil {
+		return &s.old_image, nil
+	}
 
 	gocv.AddWeighted(*next, float64(alpha), *now, float64(1.0-alpha), 0.0, &s.old_image)
 
