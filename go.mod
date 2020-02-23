@@ -11,7 +11,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.3.3
 	github.com/google/go-cmp v0.3.1 // indirect
-	github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89
+	github.com/ikascrew/ikasbox v0.0.0-20200222125414-57f83b9e51ee
 	github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88
 	github.com/ikascrew/volumes v0.0.0-20191110010825-799f11692e4c
 	github.com/ikascrew/xbox v0.0.0-20191228051708-da808c0d61a2

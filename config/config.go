@@ -36,7 +36,7 @@ func init() {
 
 func Load(p int) (*AppConfig, error) {
 
-	url := fmt.Sprintf("http://localhost:5555/project/content/list/%d", p)
+	url := fmt.Sprintf("http://10.0.0.1:5555/project/content/list/%d", p)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err

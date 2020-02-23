@@ -49,7 +49,7 @@ func Start() error {
 	if ika.testMode {
 		pid, _ := strconv.Atoi(args[2])
 		rep = &pb.SyncReply{
-			Source:  "",
+			Source:  0,
 			Type:    "",
 			Project: int64(pid),
 		}
@@ -85,7 +85,7 @@ func Start() error {
 	}()
 
 	//Main
-	win, err := NewWindow("ikascrew client", 1536, 766)
+	win, err := NewWindow("ikascrew client", 1536, 768)
 	if err != nil {
 		glog.Error("NewWindow() Error[" + err.Error() + "]")
 		return err
