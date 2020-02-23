@@ -1,2 +1,2 @@
-protoc --go_out=plugins=grpc:./ sample.proto
+protoc --go_out=plugins=grpc:./ ikascrew.proto
 

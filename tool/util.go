@@ -12,7 +12,7 @@ import (
 	_ "image/png"
 )
 
-func Search(d string, ignore []string) ([]string, error) {
+func Search(d string, target string, ignore []string) ([]string, error) {
 
 	fileInfos, err := ioutil.ReadDir(d)
 	if err != nil {
@@ -32,18 +32,14 @@ func Search(d string, ignore []string) ([]string, error) {
 	for _, f := range fileInfos {
 		fname := f.Name()
 		if f.IsDir() {
-			files, err := Search(d+"/"+fname, ignore)
+			files, err := Search(d+"/"+fname, target, ignore)
 			if err != nil {
 				return nil, err
 			}
 			rtn = append(rtn, files...)
 		} else {
-			midx := strings.LastIndex(fname, ".mp4")
-			jidx := strings.LastIndex(fname, ".jpg")
-			pidx := strings.LastIndex(fname, ".png")
-			if midx == len(fname)-4 ||
-				jidx == len(fname)-4 ||
-				pidx == len(fname)-4 {
+			midx := strings.LastIndex(fname, target)
+			if midx != -1 {
 				rtn = append(rtn, d+"/"+fname)
 			}
 		}

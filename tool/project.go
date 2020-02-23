@@ -25,7 +25,7 @@ func GetClientDir() string {
 	return CLIENT
 }
 
-const Base = "http://localhost:5555/static/images/thumb/"
+const Base = "http://10.0.0.1:5555/static/images/thumb/"
 
 func CreateProject(id string) error {
 

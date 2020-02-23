@@ -30,9 +30,9 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 	l.Part = &Part{}
 	l.Init(w, s, r)
 
-	work := "./.client/thumb"
+	work := "./.client/images"
 
-	paths, err := tool.Search(work, nil)
+	paths, err := tool.Search(work, "_thumb.jpg", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +42,9 @@ func NewList(w screen.Window, s screen.Screen) (*List, error) {
 
 	for idx, path := range paths {
 		l.images[idx], _ = tool.LoadImage(path)
-		jpg := strings.Replace(path, work, "", -1)
-		mpg := strings.Replace(jpg, ".jpg", ".mp4", -1)
-		resource := mpg
-		l.resource[idx] = resource
+
+		id := strings.Replace(path, "_thumb.jpg", "", -1)
+		l.resource[idx] = id + ".jpg"
 	}
 
 	max = len(paths) * 100 * 100

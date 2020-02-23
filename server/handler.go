@@ -40,7 +40,7 @@ func (i *IkascrewServer) Sync(ctx context.Context, r *pb.SyncRequest) (*pb.SyncR
 	i.window.FullScreen()
 
 	rep := &pb.SyncReply{
-		Source:  "wire/1.mp4",
+		Source:  0,
 		Type:    "file",
 		Project: int64(ikascrew.ProjectID()),
 	}
@@ -54,9 +54,14 @@ func (i *IkascrewServer) Effect(ctx context.Context, r *pb.EffectRequest) (*pb.E
 		Success: false,
 	}
 
-	fmt.Printf("[%s]-[%s]\n", r.Type, r.Name)
+	content, ok := ikascrew.Config.Contents[int(r.Id)]
+	if !ok {
+		return nil, fmt.Errorf("Content not found[%dj]", r.Id)
+	}
 
-	v, err := video.Get(video.Type(r.Type), r.Name)
+	fmt.Printf("[%s]-[%s]\n", r.Type, content.Path)
+
+	v, err := video.Get(video.Type(r.Type), content.Path)
 	if err != nil {
 		return rep, err
 	}

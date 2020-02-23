@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"strings"
+	"log"
 
 	"golang.org/x/exp/shiny/screen"
 
@@ -130,11 +130,8 @@ func (n *Next) add(f string) error {
 	}
 	n.resource = append(n.resource, f)
 
-	icon := strings.Replace(f, ".mp4", ".jpg", 1)
-
-	file := "./.client/icon" + icon
-
-	img, err := tool.LoadImage(file)
+	log.Println(f)
+	img, err := tool.LoadImage(f)
 
 	if err != nil {
 		return err

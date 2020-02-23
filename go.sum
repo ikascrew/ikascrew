@@ -42,6 +42,8 @@ github.com/ikascrew/ikasbox v0.0.0-20200222031902-1f5b5033473a h1:NPyk03V2sUtaUm
 github.com/ikascrew/ikasbox v0.0.0-20200222031902-1f5b5033473a/go.mod h1:3w44dobKBVuj7pR1+S+e3X+oOlClmKix5pzMhrav/hI=
 github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89 h1:Wnr1idyWfSoLT1QAWegaS6VCy3rRGESaCV+FFv7Q9Z4=
 github.com/ikascrew/ikasbox v0.0.0-20200222083150-11db77d88c89/go.mod h1:3w44dobKBVuj7pR1+S+e3X+oOlClmKix5pzMhrav/hI=
+github.com/ikascrew/ikasbox v0.0.0-20200222125414-57f83b9e51ee h1:ot14FLY6MUwL5OTQTSKyrY49zAfWrXYVMTj1TE/HeEQ=
+github.com/ikascrew/ikasbox v0.0.0-20200222125414-57f83b9e51ee/go.mod h1:3w44dobKBVuj7pR1+S+e3X+oOlClmKix5pzMhrav/hI=
 github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88 h1:IkkaZJl1pc7nDYmZydaT5pfqN12GEw6Fvo7xTMZBhh8=
 github.com/ikascrew/powermate v0.0.0-20170724041315-7b09f8e1cf88/go.mod h1:U8x+U/5XgLIE4R7F+EsxTw/VlMIwEVvWVBgffnqjcL0=
 github.com/ikascrew/volumes v0.0.0-20191110010825-799f11692e4c h1:bnnvszR81epeu/4XTtMVtCQN7egNW2I6uni70RJ3dvY=

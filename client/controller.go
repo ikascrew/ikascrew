@@ -1,6 +1,8 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/golang/glog"
@@ -63,7 +65,21 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 			if strings.Index(res, "countdown") >= 0 {
 				t = "countdown"
 			}
-			err := ika.callEffect(res, t)
+
+			idx := strings.LastIndex(res, "/")
+			buf := ""
+			if idx != -1 {
+				buf = res[idx+1:]
+				buf = strings.Replace(buf, ".jpg", "", -1)
+				fmt.Println(buf)
+			}
+
+			id, err := strconv.Atoi(buf)
+			if err != nil {
+				return fmt.Errorf("Efffect id error:[%s]", res)
+			}
+
+			err = ika.callEffect(int64(id), t)
 			if err != nil {
 				glog.Error("callEffect[" + err.Error() + "]")
 			} else {
@@ -106,7 +122,6 @@ func (ika *IkascrewClient) controller(e xbox.Event) error {
 			err := ika.selector.next.add(res)
 			if err != nil {
 				// TODO 無視
-				glog.Error("Pusher Add Error:", err)
 			}
 			ika.selector.next.Push()
 		} else {
