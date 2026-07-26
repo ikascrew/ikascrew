@@ -117,6 +117,7 @@ This repository tracks only the shared documentation:
 ```
 README.md      ← you are here / このファイル
 CLAUDE.md      ← guidance for Claude Code across the whole system
+docs/          ← cross-repository documents / リポジトリ横断のドキュメント
 ```
 
 The eight component directories are ignored via `.gitignore` — clone them yourself as shown above. Each carries its own `README.md`, and the three applications also carry a detailed `CLAUDE.md`.

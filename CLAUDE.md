@@ -46,7 +46,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working in this
 - `plugin/` — server が使う `core.Video` 実装("file", "img", "cd", "terminal")。
 - `powermate/`, `volumes/` — client の `go.mod` が `replace` でローカル参照している(変更は両リポジトリでコミット/プッシュが必要)。
 
-**このディレクトリ配下はこの8リポジトリのみ**。VJ システムと無関係だった旧・実験リポジトリ(`brender`, `generator`, `pose`, `ikamera`, `xbox`, `go-mp4`, `gocv`, および `ikascrew-stream`, `ikascrew-mp4`, `ikascrew-viewer`, `ikascrew-util`)は 2026-07-26 に `D:\Go\Projects\` 直下へ分離済み。ここに新しいディレクトリを増やす場合は VJ システムの構成要素かを確認すること。
+この8つに加えて `org-github/` がある — GitHub 上の **`ikascrew/.github`**(org のプロフィール)に対応するリポジトリ。`profile/README.md` が <https://github.com/ikascrew> のトップページに表示される。ドット始まりのディレクトリ名を避けるためローカルでは `org-github` という名前にしている。
+
+**このディレクトリ配下はこの8リポジトリ + `org-github/` のみ**。VJ システムと無関係だった旧・実験リポジトリ(`brender`, `generator`, `pose`, `ikamera`, `xbox`, `go-mp4`, `gocv`, および `ikascrew-stream`, `ikascrew-mp4`, `ikascrew-viewer`, `ikascrew-util`)は 2026-07-26 に `D:\Go\Projects\` 直下へ分離済み。ここに新しいディレクトリを増やす場合は VJ システムの構成要素かを確認すること。
 
 このディレクトリ自体も `github.com/ikascrew/ikascrew` として git 管理されている(`main` ブランチ)。ただし追跡するのは `README.md` / `CLAUDE.md` のみで、8つのサブリポジトリは `.gitignore` で除外している。
 

@@ -9,6 +9,9 @@
 /server/
 /volumes/
 
+# org の .github リポジトリ(GitHub 上の名前は ".github")
+/org-github/
+
 # Local settings / ローカル設定
 /.claude/settings.local.json
 /.claude/worktrees/
