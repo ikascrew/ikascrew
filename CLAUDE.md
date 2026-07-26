@@ -6,8 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working in this
 >
 > `D:\Go\Projects\ikascrew` を誤って `rm -rf` した。復旧は2段階で行った:
 >
-> 1. **GitHub の master から復元**(各リポジトリの最終 push は 2026-07-05〜07-08)
-> 2. **Claude Code のセッション記録(`.jsonl`)から 7/08〜7/11 の未 push 作業を再生**して復元。各リポジトリの `replay-v3` ブランチにコミット済み(`recover:` 件名)。
+> 1. **GitHub の当時の既定ブランチ(`master`)から復元**(各リポジトリの最終 push は 2026-07-05〜07-08)
+> 2. **Claude Code のセッション記録(`.jsonl`)から 7/08〜7/11 の未 push 作業を再生**して復元(`recover:` 件名)。
+>
+> 復旧後に8リポジトリとも既定ブランチを **`main` に移行**し、復元内容はすべて `main` に入っている(作業用の `replay-v1` / `replay-v2` / `replay-v3` および旧 `master` は削除済み)。
 >
 > 復元できたもの: `core.Frame` 型による gocv 分離、server の同居モード(`-ikasbox` / `server/ikasbox.go`)、`ikasbox/db` の `migrate()`、大量のテストファイル、`docs/TEST_PLAN.md` の元となる `TEST_PLAN.md`。**本体コードは8リポジトリすべて `go build ./...` が通る。**
 >
