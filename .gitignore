@@ -1,0 +1,17 @@
+# Each subdirectory below is an independent Git repository and is NOT tracked here.
+# 以下の各サブディレクトリは独立した Git リポジトリのため、このリポジトリでは追跡しない。
+/client/
+/core/
+/ikasbox/
+/pb/
+/plugin/
+/powermate/
+/server/
+/volumes/
+
+# Local settings / ローカル設定
+/.claude/settings.local.json
+/.claude/worktrees/
+
+# Working files / 作業ファイル
+*.db
