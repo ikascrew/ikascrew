@@ -2,18 +2,32 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working in this directory.
 
-> ## ⚠️ 2026-07-26 のデータ消失について
+> ## ⚠️ 2026-07-26 のデータ消失と復旧について
 >
-> `D:\Go\Projects\ikascrew` を誤って `rm -rf` したため、**各リポジトリの作業ツリーは GitHub の master から復元した**。復元時点の各リポジトリ最終コミットは **2026-07-05〜07-08**。
-> **7/8 以降の未 push 作業は失われている。** このファイルの記述は消失前(7/26 時点)のものを保持しているため、**下記の項目はドキュメントにはあるがコードには存在しない**:
+> `D:\Go\Projects\ikascrew` を誤って `rm -rf` した。復旧は2段階で行った:
 >
-> - `core.Frame` 型による gocv 依存の分離 — 復元コードでは `ikasbox` / `server` がまだ `gocv.io/x/gocv` を直接 import している(3箇所)
-> - `plugin/video/param` パッケージ(JSON params のパース層)
-> - server の同居モード `-ikasbox` / `-db` フラグ
+> 1. **GitHub の master から復元**(各リポジトリの最終 push は 2026-07-05〜07-08)
+> 2. **Claude Code のセッション記録(`.jsonl`)から 7/08〜7/11 の未 push 作業を再生**して復元。各リポジトリの `replay-v3` ブランチにコミット済み(`recover:` 件名)。
 >
-> 一方、`video.Normalize` による語彙正規化、`ikasbox content register` サブコマンド、`contents.params` カラム、work file 基準の `Effect` 解決、`core/multicast` は復元コードにも**存在する**。
+> 復元できたもの: `core.Frame` 型による gocv 分離、server の同居モード(`-ikasbox` / `server/ikasbox.go`)、`ikasbox/db` の `migrate()`、大量のテストファイル、`docs/TEST_PLAN.md` の元となる `TEST_PLAN.md`。**本体コードは8リポジトリすべて `go build ./...` が通る。**
 >
-> これらの再実装が必要。以後は**こまめに push すること**。
+> **まだ失われているもの**(セッション記録の外で書かれたため復元不能):
+>
+> - `plugin/video/param/param.go` — `param_test.go` だけが復元され、本体が無い
+> - 各プラグインの `Spec` API(`video.Spec` / `file.Spec` / `image.Spec` / `terminal.Spec`)
+> - `ikasbox/handler/api` のテストヘルパ `setupDB`
+> - `client/window` の `fitScale` / `playerSwitchValue`、`client` の `callGetVolumes`
+> - `server/stream.go` の `safeNext`(パニック捕捉)
+> - countdown / terminal の解像度追従描画(`putCenterText`、`unit`/`thickness` スケーリング)
+>
+> **再構成したもの**(消失前の実装とは細部が異なる可能性あり):
+>
+> - `plugin/video/output` — 呼び出し側から API(`Set` / `Size` / `DefaultWidth` / `DefaultHeight`)を逆算して書き直した
+> - countdown / terminal の `*core.Frame` 対応 — 描画ロジックは 7/07 版のまま機械的に適合させた
+>
+> 上記が未解決のため `go test ./...` は plugin / ikasbox(handler,contentimport)/ server / client でビルド失敗が残る。
+>
+> **以後はこまめに push すること。**
 
 ## このディレクトリについて
 
