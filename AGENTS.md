@@ -77,7 +77,7 @@ This file provides guidance to coding agents when working in this directory.
 - **OpenCV(gocv)** が ikasbox と server のビルドに必須。
 - 設定は各パッケージとも functional options によるグローバルシングルトン(`config.Set(opts...)` / `config.Get()`)パターン。
 - エラーは `golang.org/x/xerrors` でラップ。コメント・コミットメッセージは日本語が多く、コミット件名は `fix:` / `feat:` / `perf:` / `chore:` プレフィックス。
-- テストはほぼ存在しない(ikasbox の `db/` に1ファイルのみ)。
+- テストは `pb` 以外の各リポジトリにあり、それぞれ `go test ./...` で通る。ikasbox はフロントエンドにも vitest のテストがある(`frontend/` で `npm test`)。横断のテスト計画は `docs/TEST_PLAN.md`。
 - 各リポジトリは GitHub の同一 org(`github.com/ikascrew/*`)配下で、pseudo-version 依存で相互参照している。
 
 ## 起動手順(最短)
