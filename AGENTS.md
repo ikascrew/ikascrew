@@ -33,7 +33,7 @@ This file provides guidance to coding agents when working in this directory.
 
 ## このディレクトリについて
 
-**ikascrew** — VJ(ビデオジョッキー)用の映像再生システムを構成する複数の Go リポジトリを並べた作業ディレクトリ。中心となるのは次の3パッケージで、それぞれに詳細な `CLAUDE.md` がある — **各パッケージ内で作業するときは必ずそのパッケージの CLAUDE.md を読むこと。**
+**ikascrew** — VJ(ビデオジョッキー)用の映像再生システムを構成する複数の Go リポジトリを並べた作業ディレクトリ。中心となるのは次の3パッケージで、それぞれに詳細な `AGENTS.md` がある — **各パッケージ内で作業するときは必ずそのパッケージの AGENTS.md を読むこと。**
 
 | パッケージ | 役割 | ポート |
 |---|---|---|
@@ -85,7 +85,7 @@ This file provides guidance to coding agents when working in this directory.
 
 例: `content register 1 "NewYear" cd "{\"target\":\"2027-01-01T00:00:00+09:00\",\"text\":\"HNY\"}"`
 
-型ごとの params スキーマと新プラグインの追加手順は **`plugin/CLAUDE.md`** に明文化されている(語彙・param 形式の本家は plugin リポジトリ)。
+型ごとの params スキーマと新プラグインの追加手順は **`plugin/AGENTS.md`** に明文化されている(語彙・param 形式の本家は plugin リポジトリ)。
 
 ## 共通の前提・慣習
 

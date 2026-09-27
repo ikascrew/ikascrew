@@ -120,7 +120,7 @@ AGENTS.md      ← guidance for coding agents across the whole system
 docs/          ← cross-repository documents / リポジトリ横断のドキュメント
 ```
 
-The eight component directories are ignored via `.gitignore` — clone them yourself as shown above. Each carries its own `README.md`, and the three applications also carry a detailed `CLAUDE.md`. The org profile repository ([`ikascrew/.github`](https://github.com/ikascrew/.github)) is checked out alongside them as `org-github/` and is ignored too.
+The eight component directories are ignored via `.gitignore` — clone them yourself as shown above. Each carries its own `README.md`, and the three applications also carry a detailed `AGENTS.md`. The org profile repository ([`ikascrew/.github`](https://github.com/ikascrew/.github)) is checked out alongside them as `org-github/` and is ignored too.
 
 8つのコンポーネントディレクトリは `.gitignore` で除外しています。各リポジトリは個別に clone してください。org のプロフィール用リポジトリ(`ikascrew/.github`)も `org-github/` として並置し、同様に除外しています。
 
