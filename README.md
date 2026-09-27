@@ -116,7 +116,7 @@ This repository tracks only the shared documentation:
 
 ```
 README.md      ← you are here / このファイル
-CLAUDE.md      ← guidance for Claude Code across the whole system
+AGENTS.md      ← guidance for coding agents across the whole system
 docs/          ← cross-repository documents / リポジトリ横断のドキュメント
 ```
 

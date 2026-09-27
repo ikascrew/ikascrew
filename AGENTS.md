@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working in this directory.
+This file provides guidance to coding agents when working in this directory.
 
 > ## ⚠️ 2026-07-26 のデータ消失と復旧について
 >
@@ -52,7 +52,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working in this
 
 **このディレクトリ配下はこの8リポジトリ + `org-github/` のみ**。VJ システムと無関係だった旧・実験リポジトリ(`brender`, `generator`, `pose`, `ikamera`, `xbox`, `go-mp4`, `gocv`, および `ikascrew-stream`, `ikascrew-mp4`, `ikascrew-viewer`, `ikascrew-util`)は 2026-07-26 に `D:\Go\Projects\` 直下へ分離済み。ここに新しいディレクトリを増やす場合は VJ システムの構成要素かを確認すること。
 
-このディレクトリ自体も `github.com/ikascrew/ikascrew` として git 管理されている(`main` ブランチ)。ただし追跡するのは `README.md` / `CLAUDE.md` のみで、8つのサブリポジトリは `.gitignore` で除外している。
+このディレクトリ自体も `github.com/ikascrew/ikascrew` として git 管理されている(`main` ブランチ)。ただし追跡するのは `README.md` / `AGENTS.md` / `docs/` のみで、8つのサブリポジトリは `.gitignore` で除外している。
 
 ## 全体のデータフロー
 
