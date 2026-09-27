@@ -4,17 +4,12 @@ This file provides guidance to coding agents when working in this directory.
 
 ## 既知の欠落
 
-2026-07-26 に作業ツリーを失い、GitHub とセッション記録から復元した。復元できなかった実装が残っている(`go build ./...` / `go test ./...` は全リポジトリで通る):
+2026-07-26 に作業ツリーを失い、GitHub とセッション記録から復元した。復元できなかった実装が残っている(`go build ./...` / `go test ./...` は全リポジトリで通る)。詳細は各リポジトリの README の TODO にある:
 
-- `server/stream.go` の `safeNext` — `Next()` のパニック捕捉が無い。`stream.go` は `Next()` を直接呼んでいる(`stream_test.go` のコメントだけが名前を参照)
-- countdown / terminal の解像度追従描画 — `putCenterText` や `unit`/`thickness` のスケーリングが無く、`PutText` の座標・サイズは固定値のまま
+- `server/README.md` — `Next()` のパニック捕捉(`safeNext`)
+- `plugin/README.md` — countdown / terminal の解像度追従描画、再構成したコード(`video/output` など)の見直し
 
-**再構成したもの**(消失前の実装とは細部が異なる可能性あり):
-
-- `plugin/video/output` — 呼び出し側から API(`Set` / `Size` / `DefaultWidth` / `DefaultHeight`)を逆算して書き直した
-- countdown / terminal の `*core.Frame` 対応 — 描画ロジックは 7/07 版のまま機械的に適合させた
-
-直したら項目を消し、空になったらこの節ごと消す。**こまめに push すること。**
+**こまめに push すること。**
 
 ## このディレクトリについて
 
